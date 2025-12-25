@@ -1,625 +1,246 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>GHの浏览器本地主页</title>
-    <!-- 导入.CSS样式表 -->
-    <!-- <link rel="stylesheet" href="styles.css"> -->
-    <!-- 导入图标 -->
-    <link rel="icon" href="favicon.ico" type="image/x-icon">    
-    <style>
-        * {
-            /* 所有元素的：外边距、内边距、盒尺寸包含内边距和边框 */
-            margin: 0;  
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            /* 外链url图像，缩放图像适应背景 */
-            /* background: url('https://picsum.photos/1920/1080') no-repeat center center fixed; */
-            background-size: cover;         
-            background-repeat: no-repeat;
-            min-height: 100vh;      /* 设置最小高度为视口高度的100% */
-            display: flex; /* 使body成为一个flex容器 */
-            flex-direction: column; /* 主轴为垂直方向 */
-            font-family: Arial, sans-serif;
-            font-size: 16px;
-            /* background: #f0f2f5; */
-            color: black;   /*默认文本色*/
-            padding: 20px;    /* 内容与边框的距离 */
-        }
-            /* 菜单栏(弃用) */
-            .menu-bar{
-                position: fixed;
-                top:8px;
-                left:10px;
-                /* padding: 10px; */
-                z-index: 10;
-                display:flex;
-                align-items: center;        /*垂直居中 */
-                /* background: #333; */
-            }
-            
-            .hsButton{       /* Menu下的所有button元素选择器 */
-                /* margin-left: 10px; */
-                /* max-height: px; */
-                background-color:rgba(70, 198, 113, 0.4);
-                box-shadow: 0 3px 6px rgba(130, 137, 131, 0.7);
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 5px 8px;
-                cursor: pointer; 
-            }
-            .hsButton:hover {
-                background-color: rgba(23, 180, 232, 0.7); 
-                transform: translateY(2px);     /* 偏移 */
-            }
+<!DOCTYPE HTML>
+<!--
+	Phantom by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Phantom by HTML5 UP</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+		<!-- Wrapper -->
+			<div id="wrapper">
 
-            /* 背景切换开关样式 */
-            /* 修改原有.switch样式，添加flex布局 */
-            .switch-container {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 9;
-                display: flex;      
-                gap:10px;
-                flex-direction: column;
-                align-items: flex-end; 
-                    /* 纵向排列，右侧对齐 */
-            }
-            .switch {
-                /* position: fixed;
-                top: 20px;
-                right: 20px; */
-                /* z-index: 999; */
-                display: flex;      
-                align-items: center; 
-            }
-            .switch-label {
-                margin-right: 5px;
-                padding: 5px;
-                border-radius: 15px;
-                background: rgba(7, 6, 6, 0.6);
-                color: #dbe5db;
-                font: italic 14px Arial ;
-                user-select: none; /* 防止文字被选中 */
-            }
-            .toggle {
-                opacity: 0; /* 不透明度 */
-                position: absolute;
-            }
+				<!-- Header -->
+					<header id="header">
+						<div class="inner">
 
-            .toggle + label {
-                display: block;
-                position: relative;
-                width: 60px;
-                height: 34px;
-                background-color: #ccc;
-                border-radius: 34px;
-                cursor: pointer;
-                transition: background 0.4s;
-            }
+							<!-- Logo -->
+								<a href="index.html" class="logo">
+									<span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">Phantom</span>
+								</a>
 
-            .toggle + label:before {
-                content: "";
-                /* text-align: center;  */
-                position: absolute;
-                top: 4px;
-                left: 4px;
-                width: 26px;
-                height: 26px;
-                background: white;
-                border-radius: 50%;
-                transition: transform 0.4s;
+							<!-- Nav -->
+								<nav>
+									<ul>
+										<li><a href="#menu">Menu</a></li>
+									</ul>
+								</nav>
 
-            }
+						</div>
+					</header>
 
-            .toggle:checked + label {
-                background-color: #2196F3;
-            }
+				<!-- Menu -->
+					<nav id="menu">
+						<h2>Menu</h2>
+						<ul>
+							<li><a href="index.html">Home</a></li>
+							<li><a href="generic.html">Ipsum veroeros</a></li>
+							<li><a href="generic.html">Tempus etiam</a></li>
+							<li><a href="generic.html">Consequat dolor</a></li>
+							<li><a href="elements.html">Elements</a></li>
+						</ul>
+					</nav>
 
-            .toggle:checked + label:before {
-                transform: translateX(26px);
-            }
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+							<header>
+								<h1>This is Phantom, a free, fully responsive site<br />
+								template designed by <a href="http://html5up.net">HTML5 UP</a>.</h1>
+								<p>Etiam quis viverra lorem, in semper lorem. Sed nisl arcu euismod sit amet nisi euismod sed cursus arcu elementum ipsum arcu vivamus quis venenatis orci lorem ipsum et magna feugiat veroeros aliquam. Lorem ipsum dolor sit amet nullam dolore.</p>
+							</header>
+							<section class="tiles">
+								<article class="style1">
+									<span class="image">
+										<img src="images/pic01.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Magna</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style2">
+									<span class="image">
+										<img src="images/pic02.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Lorem</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style3">
+									<span class="image">
+										<img src="images/pic03.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Feugiat</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style4">
+									<span class="image">
+										<img src="images/pic04.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Tempus</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style5">
+									<span class="image">
+										<img src="images/pic05.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Aliquam</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style6">
+									<span class="image">
+										<img src="images/pic06.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Veroeros</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style2">
+									<span class="image">
+										<img src="images/pic07.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Ipsum</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style3">
+									<span class="image">
+										<img src="images/pic08.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Dolor</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style1">
+									<span class="image">
+										<img src="images/pic09.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Nullam</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style5">
+									<span class="image">
+										<img src="images/pic10.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Ultricies</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style6">
+									<span class="image">
+										<img src="images/pic11.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Dictum</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+								<article class="style4">
+									<span class="image">
+										<img src="images/pic12.jpg" alt="" />
+									</span>
+									<a href="generic.html">
+										<h2>Pretium</h2>
+										<div class="content">
+											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+										</div>
+									</a>
+								</article>
+							</section>
+						</div>
+					</div>
 
+				<!-- Footer -->
+					<footer id="footer">
+						<div class="inner">
+							<section>
+								<h2>Get in touch</h2>
+								<form method="post" action="#">
+									<div class="fields">
+										<div class="field half">
+											<input type="text" name="name" id="name" placeholder="Name" />
+										</div>
+										<div class="field half">
+											<input type="email" name="email" id="email" placeholder="Email" />
+										</div>
+										<div class="field">
+											<textarea name="message" id="message" placeholder="Message"></textarea>
+										</div>
+									</div>
+									<ul class="actions">
+										<li><input type="submit" value="Send" class="primary" /></li>
+									</ul>
+								</form>
+							</section>
+							<section>
+								<h2>Follow</h2>
+								<ul class="icons">
+									<li><a href="#" class="icon brands style2 fa-twitter"><span class="label">Twitter</span></a></li>
+									<li><a href="#" class="icon brands style2 fa-facebook-f"><span class="label">Facebook</span></a></li>
+									<li><a href="#" class="icon brands style2 fa-instagram"><span class="label">Instagram</span></a></li>
+									<li><a href="#" class="icon brands style2 fa-dribbble"><span class="label">Dribbble</span></a></li>
+									<li><a href="#" class="icon brands style2 fa-github"><span class="label">GitHub</span></a></li>
+									<li><a href="#" class="icon brands style2 fa-500px"><span class="label">500px</span></a></li>
+									<li><a href="#" class="icon solid style2 fa-phone"><span class="label">Phone</span></a></li>
+									<li><a href="#" class="icon solid style2 fa-envelope"><span class="label">Email</span></a></li>
+								</ul>
+							</section>
+							<ul class="copyright">
+								<li>&copy; Untitled. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</div>
+					</footer>
 
-        /* 一、时间日期容器*/
-        .time-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;    /*弹性项排列：水平居中*/
-            align-items: center;
-            /* gap:-8px; */
-            margin-top: 50px;
-            text-align: center;
-        }
-        /* 时间日期格式 */
-        #time {
-            font-size: 2em;     /*默认字体的倍数*/
-            font-weight: 300;
-            padding: 8px 8px 0px 8px;
-            background: rgba(4, 4, 4, 0.7);
-            /* border-radius: 3px;     */
-            border-radius: 15px 15px 0 0;
-            /* text-shadow: 2px 2px 4px rgba(11, 140, 149, 0.5); */
-            color: #4CAF50;
-        }
-        #date {
-            font-size: 1.5em;
-            padding: 0px 20px 5px 20px;
-            background: rgba(4, 4, 4, 0.7);
-            border-radius: 20px;   
-            color: #4CAF50;
-        }
+			</div>
 
-        /* 二、搜索栏容器 */
-        .search-container {
-            /*容器样式*/
-            margin: 10px auto;    /*上下外边距；左右居中*/
-            width: 100%;          /*避免挤压子元素form*/
-            padding: 20px;
-            /* border: 2px solid #0db7dd; */
-            
-            /*子元素布局*/
-            display: flex;              /* 启用flex布局: （默认水平排列）*/
-            justify-content: center;    /*弹性项排列：水平居中*/
-            /* align-items: center;         */
-                /*单行弹性项：垂直居中*/
-            gap: 10px;                  /* 弹性项间距 */
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
 
-        }
-        /* 搜索表单:不添加样式没法控制子元素了！！ */
-        #search-form {
-            width: 80%;
-            display: flex;
-            justify-content: center; 
-            align-items: center;
-            gap: 10px;
-            /* border: 2px solid #0db7dd; */
-        }
-        /* 搜索引擎选择框 */
-        #search-engine {
-            /* flex:0 1 100px;      */
-                /* 不放大、可缩小、基准 */
-            /* width: 120px; */
-            height: 40px;
-            padding: 0px 0 1px 10px;            /*内间距*/
-            font:bolder italic 16px 'Arial';
-            color:rgba(25, 51, 38, 0.85);
-            /* font-size: 16px; */
-            /* background: transparent; */
-            background: rgba(185, 188, 186, 0.501);
-            border-radius: 8px;      
-            border: 2px solid #a3aca4;
-        }
-        /* 搜索输入框 */
-        #search-input {
-            flex: 1 1 auto;              /* 自动填充剩余空间 */
-            min-width: 100px;         /* 最小宽度 */
-            max-width: 300px;           /* 最大宽度 */
-            padding: 10px;
-            font-size: 16px;
-            background: #f2f2f2;
-            border-radius: 13px;    
-            border: 2px solid #4CAF50;  
-            outline: none;
-        }
-        /* 搜索按钮 */
-        #search-btn {
-            /* font-size: 14px; */
-            font:bolder italic 14px 'Kaiti';
-            border: none;           /*无边框*/
-            height: 40px;
-            border-radius: 13px;
-            padding: 5px;
-
-            /* aspect-ratio: 1 / 1;     */
-            background: #e5edee72;
-            color: rgb(58, 115, 88);           /*文本颜色*/
-            cursor: pointer;         /* 鼠标悬停时显示手型 */
-            transition: background 0.3s; /* 鼠标悬停时背景色变化时间 */
-        }
-        #search-btn:hover {
-            background: #1be769;
-        }
-
-        /* 书签总容器 */
-        .bookmarks {
-            display: flex;
-            justify-content: center;    /* 沿水平轴中心分布 */
-            flex-wrap: wrap;            /* 允许换行 */
-            gap: 20px;
-            margin: 40px auto;          
-            /* max-width: 1200px; */
-            padding: 20px;
-            /* background: rgba(0,0,0,0.7); */
-            border-radius: 15px;
-        }
-        /* 分类栏 */
-        .category {
-            min-width: 250px;
-            padding: 15px;
-            /* background: white; */
-            background: rgba(4, 4, 4, 0.5);
-            border-radius: 8px;
-            box-shadow: 0 3px 6px rgba(2, 17, 4, 0.7);
-            transition: transform 0.2s;     
-                /* 平滑动态效果 */
-        }
-
-        /* 后代选择器：分类栏内的h3 */
-        .category h3 {
-            color: #4CAF50;
-            text-align: center;
-            margin-bottom: 5px;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 5px;
-        }
-
-        /* 分类栏下的，链接样式 */
-        .category a {
-            display: block;
-            color: white;
-            /* text-align: center; */
-            text-decoration: none;
-            padding: 8px;
-            margin: 5px 0;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        .category a:hover {
-            background: rgba(14, 242, 90, 0.4);  /* 悬停色 */
-            transform: translateX(5px);     /* 偏移 */
-        }
-
-        .error-message {
-            color: #ff4444;
-            text-align: center;
-            margin: 20px;
-        }
-    </style>
-</head>
-<body>
-    <!-- 背景切换相关开关 -->
-     <div class="switch-container">
-        <div class="switch">
-            <span class="switch-label">随机背景切换</span>
-            <input type="checkbox" id="bgToggle" class="toggle">
-            <label for="bgToggle"></label>
-        </div>
-        <div class="switch">
-            <span class="switch-label">必应每日壁纸</span>
-            <input type="checkbox" id="pureBack" class="toggle">
-            <label for="pureBack"></label>
-        </div>
-        <button id="SearchHistory_OnOff" class="hsButton">搜索历史开关</button>
-     </div>
-    <!-- 菜单栏Menu -->
-    <!-- <div class="menu">
-        <button id="SearchHistory_OnOff">搜索历史开关</button>
-    </div> -->
-
-
-    <!--一、 时间日期显示 -->
-    <div class="time-container">
-        <div id="time"></div>
-        <div id="date"></div>
-    </div>
-
-    <!--二、 搜索栏容器 -->
-    <div class="search-container" id="search-container">
-        <form id="search-form">
-            <!-- 必须使用form表单，否则无法触发submit事件 -->
-            <select id="search-engine">         <!-- 选择搜索引擎 -->
-                <option value="bing">Bing</option>
-                <option value="baidu">Baidu</option>
-                <option value="google">Google</option>
-                <option value="yandex">Yandex</option>
-                <option value="zhihu">Zhihu</option>
-                <option value="csdn">CSDN</option>
-            </select>
-            <input type="text" id="search-input" placeholder=" GeorgeHua:请输入搜索内容" autocomplete="on">
-            <button type="submit" id="search-btn">Search</button>
-            <!-- <button id="SearchHistory_OnOff" class="hsButton">搜索历史开关</button> -->
-        </form>
-    </div>
-    <!--三、 书签分栏容器 -->
-    <div id="bookmarks-container" class="bookmarks"></div>
-    <div id="error-message" class="error-message"></div>
-    
-    <script>
-        const bookmarksData = [
-
-            {
-                "name": "GH首页常用",
-                "links": [
-                    {"title": "BiliBili", "url": "https://www.bilibili.com/"},
-                    {"title": "语雀", "url": "https://www.yuque.com/dashboard/notes"},
-                    {"title": "有道翻译", "url": "https://dict.youdao.com/"},
-                    {"title": "豆包", "url": "https://www.doubao.com/chat/"},               
-                    {"title": "CSDN_内容中心", "url": "https://mp.csdn.net/mp_blog/manage/article", "desc": "GH的内容"}
-                ]
-            },
-            {
-                "name": "AI",
-                "links": [
-                    {"title": "Deepseek", "url": "https://chat.deepseek.com/"},
-                    {"title": "豆包", "url": "https://www.doubao.com/chat/"},
-                    {"title": "知乎直达", "url": "https://zhida.zhihu.com/"},
-                    {"title": "Kimi", "url": "https://kimi.moonshot.cn/"},
-                    {"title": "秘塔 AI", "url": "https://metaso.cn/"},
-                    {"title": "即梦 AI - 绘图", "url": "https://jimeng.jianying.com/ai-tool/home"}
-                ]
-            },
-            {
-                "name": "学业官方",
-                "links": [
-                {"title": "上网登录", "url": "https://xha.ouc.edu.cn/"},
-                {"title": "研究生信息门户", "url": "https://my.ouc.edu.cn/#/home"},
-                {"title": "培养方案", "url": "https://pgs.ouc.edu.cn/py/page/student/ckgrxxjh.htm"},
-                {"title": "海大正版软件", "url": "http://ms.ouc.edu.cn/"},
-                {"title": "学信档案", "url": "https://my.chsi.com.cn/archive/bab/index.action"}
-                ]
-            },
-            {
-                "name": "商城",
-                "links": [
-                    {"title": "立创商城", "url": "https://www.szlcsc.com/"},
-                    {"title": "半岛小芯", "url": "http://www.semiee.com/"},
-                    {"title": "淘宝", "url": "https://www.taobao.com/"},
-                    {"title": "京东", "url": "https://www.jd.com/"}
-                ]
-            },
-            {
-                "name": "翻译+论文",
-                "links": [
-                    {"title": "中国知网 - 检索", "url": "https://www.cnki.net/"},
-                    {"title": "谷歌学术", "url": "https://scholar.google.com.hk/schhp?hl=zh-CN&as_sdt=0,5"},
-                    {"title": "CNKI 学术翻译", "url": "https://dict.cnki.net/index#"},
-                    {"title": "DeepLy", "url": "https://www.deepl.com/zh/translator"},
-                    {"title": "百度翻译", "url": "https://fanyi.baidu.com/"},
-                    {"title": "沪江小 D - 日语", "url": "https://dict.hjenglish.com/jp"},
-                    {"title": "小绿鲸文献翻译", "url": "https://www.xljsci.com/editor/"}
-                ]
-            },
-            {
-                "name": "开发学习",
-                "links": [
-                {"title": "立创开源平台", "url": "https://wiki.lceda.cn/zh-hans/"},
-                {"title": "立创 EDA 专业版指南", "url": "https://prodocs.lceda.cn/cn/quick-start.html"},
-                {"title": "中国大学 MOOC", "url": "https://www.icourse163.org/"},
-                {"title": "博客 - UinIO", "url": "http://uinio.com/"},
-                {"title": "菜鸟教程 (C#)", "url": "https://www.runoob.com/csharp/csharp-tutorial.html"},
-                {"title": "CSS 属性手册", "url": "https://www.cainiaojc.com/css-reference/css-reference.html"}
-                ]
-            }
-
-            
-        ];
-
-
-        // 搜索引擎配置(添加：变量名+name/url+搜索栏Option)
-        const searchEngines = {
-            bing: { name: "必应", url: "https://cn.bing.com/search?q={query}" },
-            baidu: { name: "百度", url: "https://www.baidu.com/s?wd={query}" },
-            yandex: { name: "Yandex", url: "https://yandex.com/search?q={query}" },
-            google: { name: "谷歌", url: "https://www.google.com/search?q={query}" },
-            zhihu: { name: "知乎", url: "https://www.zhihu.com/search?type=content&q={query}" },
-            csdn: { name: "CSDN", url: "https://so.csdn.net/so/search?q={query}" },
-            
-        };
-
-
-        // 更新时间
-        function updateTime() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('time').textContent = now.toLocaleTimeString();
-            document.getElementById('date').textContent = now.toLocaleDateString('zh-CN', options);
-        }       
-
-        // 搜索处理
-        function handleSearch(event) {
-            event.preventDefault();
-            const query = document.getElementById('search-input').value.trim();
-                // 获取搜索关键词并去除前后空格
-            if (!query) return;
-
-            const engine = document.getElementById('search-engine').value;
-            const searchUrl = searchEngines[engine].url.replace('{query}', encodeURIComponent(query));
-            window.location.href = searchUrl;
-        }
-
-        // 书签加载
-        function loadBookmarks() {
-            try {
-                // 获取书签容器元素
-                const container = document.getElementById('bookmarks-container');
-                // 清空容器内容（避免重复加载）
-                container.innerHTML = '';
-                // 遍历每个书签分类
-                bookmarksData.forEach(category => {
-                    // 创建容器 div(分类栏.category)
-                    const categoryDiv = document.createElement('div');
-                    categoryDiv.className = 'category';
-                      
-                    // 使用模板字符串构建分类内容（难）
-                    /*
-
-                    */
-                    categoryDiv.innerHTML = `
-                        <h3>${category.name}</h3>
-                        ${category.links.map(link => `
-                            <a href="${link.url}" target="_blank" 
-                                title="${link.desc || ''}">
-                                ${link.title}
-                            </a>
-                        `).join('')}
-                    `;
-
-                    // 将分类容器添加到主容器
-                    container.appendChild(categoryDiv);
-                });   
-            } catch (error) {
-                console.error('书签加载错误:', error);
-                document.getElementById('error-message').textContent = 
-                    '书签初始化失败，请检查数据结构是否正确';
-            }
-        }
-
-        // 初始化
-        function init() {
-            // 时间初始化
-            updateTime();
-            setInterval(updateTime, 1000);
-            
-            // 事件监听
-            document.getElementById('search-form').addEventListener('submit', handleSearch);
-                // 为搜索表单添加提交事件监听器
-
-            // // 加载书签
-            loadBookmarks();
-
-            // 搜索引擎本地存储
-            const savedEngine = localStorage.getItem('selectedEngine');
-            if (savedEngine && searchEngines[savedEngine]) {
-                document.getElementById('search-engine').value = savedEngine;
-                // 设置下拉框的值为上次选择的搜索引擎
-            }
-            
-            document.getElementById('search-engine').addEventListener('change', (e) => {
-                    // 为搜索引擎选择下拉框添加变化事件监听器
-                localStorage.setItem('selectedEngine', e.target.value);
-            });
-        }
-
-
-        /*背景设置函数:
-            ckbox1:  背景图是否更新           |id="bgToggle"
-            checkbox2:是否使用纯色背景        |id="pureBack"
-        */
-        function bg_set(){
-            /*根据ID获取元素*/
-            const toggle1 = document.getElementById('bgToggle');
-            const toggle2 = document.getElementById('pureBack');    //纯色背景check
-            const body = document.body;
-
-            // 读取本地存储设置
-            const bgPure = localStorage.getItem('bgPure');
-            const bgState = localStorage.getItem('bgState');
-            const savedImageId = localStorage.getItem('imageId');
-
-            // 初始化状态（默认开启图片模式）
-            let isDynamicBg = bgState ? bgState === 'dynamic' : true;
-            let isPureBg = bgPure ? bgPure==='pure' : false;
-            /*逻辑表：
-                存储中bgPure的值    isPureBg判断参数
-                    null                0
-                    pure                1
-                    notpure             0
-            */
-            // 初始化checkbox状态
-            toggle1.checked = isDynamicBg;
-            toggle2.checked = isPureBg;
-
-
-            // 内嵌函数：生成随机图片ID（1-1000之间的图片）
-            function generateImageId() {
-                return Math.floor(Math.random() * 1000) + 1;
-            }
-            // 内嵌函数：设置背景
-            function applyBackground(imageId) {
-                if(imageId==2000 || bgPure==='pure'){       //toggle2打开状态
-                    // body.style.backgroundColor = '#f0f2f5';
-                    body.style.background= `url(https://bing.biturl.top/?format=image&index=0) no-repeat center center fixed`;
-                }else{
-                    body.style.background = `url(https://picsum.photos/id/${imageId}/1920/1080) no-repeat center center fixed`;
-                    body.style.backgroundSize = 'cover';
-                }
-            } 
-            
-            // 初始化背景
-            if (isDynamicBg) {
-                // 动态模式：生成新ID
-                const newId = generateImageId();
-                localStorage.setItem('imageId', newId);
-                applyBackground(newId);
-            } else {
-                // 静态模式：使用存储的ID（如果没有则生成）
-                const idToUse = savedImageId || generateImageId();
-                applyBackground(idToUse);
-            }
-            
-            // 事件监听：checkbox
-            toggle1.addEventListener('change', function() {
-                if (this.checked) {
-                    // 开启动态模式：生成新ID并保存
-                    const newId = generateImageId();
-                    localStorage.setItem('imageId', newId);
-                    localStorage.setItem('bgState', 'dynamic');
-                    applyBackground(newId);
-                } else {
-                    // 关闭动态模式：保留当前ID
-                    const currentId = localStorage.getItem('imageId');
-                    localStorage.setItem('bgState', 'static');
-                    applyBackground(currentId);
-                }
-            });
-            //toggle2监听函数
-            toggle2.addEventListener('change',function(){
-                if(this.checked){
-                    localStorage.setItem('bgPure', 'pure');
-                    applyBackground(2000);
-                }else{
-                    localStorage.setItem('bgPure', 'notpure');
-                }
-            })
-        }
-
-        function HistorySet_Change(){
-            // 获取搜索输入框
-           const searchInput = document.getElementById('search-input');
-            // searchInput.setAttribute('autocomplete', 'off');
-            // 设置autocomplete属性
-            let CompleteSet = localStorage.getItem('CompFlag');
-            let HSbutton = document.getElementById("SearchHistory_OnOff");
-            if(CompleteSet===null || CompleteSet==='on'){
-                searchInput.setAttribute('autocomplete', 'off');
-                localStorage.setItem('CompFlag','off');
-                HSbutton.textContent = "搜索历史:关";
-            }else{
-                searchInput.setAttribute('autocomplete', 'on');
-                localStorage.setItem('CompFlag','on');
-                HSbutton.textContent = "搜索历史:开";
-            }     
-        }
-        function HistorySet(){
-            const searchInput = document.getElementById('search-input');
-            let HSbutton = document.getElementById("SearchHistory_OnOff");
-            // searchInput.setAttribute('autocomplete', 'off');
-            // 设置autocomplete属性
-            let CompleteSet = localStorage.getItem('CompFlag');
-            if(CompleteSet===null || CompleteSet==='on'){
-                searchInput.setAttribute('autocomplete', 'on');
-                HSbutton.textContent = "搜索历史:开";
-            }else{
-                searchInput.setAttribute('autocomplete', 'off');
-                HSbutton.textContent = "搜索历史:关";
-            }    
-        }
-        
-        // 监听按键
-        document.getElementById('SearchHistory_OnOff').addEventListener('click', HistorySet_Change);
-
-
-        // 启动应用
-        window.addEventListener('DOMContentLoaded', bg_set); //背景设置
-        window.addEventListener('DOMContentLoaded', HistorySet); //搜索历史补全设置
-        window.addEventListener('DOMContentLoaded', init);
-        
-    </script>
-</body>
+	</body>
 </html>
