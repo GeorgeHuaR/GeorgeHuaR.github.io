@@ -1466,3 +1466,292 @@ body {
     overflow: hidden; /* 容器自身不产生滚动条 */
     border-radius: inherit; /* 继承 .content-card 的圆角 */
 }
+
+/* ========== 10. 移动端响应式适配 ========== */
+/*#region 移动端响应式适配 - Mobile Responsive */
+
+/* 平板设备 (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+    .main-content {
+        padding: 20px;
+    }
+    
+    .homepage-container {
+        padding: 0 20px;
+    }
+}
+
+/* 手机设备 (< 768px) */
+@media screen and (max-width: 768px) {
+    /* 整体缩小基础字体 */
+    html {
+        font-size: 14px;
+    }
+    
+    /* 侧边栏 - 手机端进一步收窄 */
+    .sidebar {
+        width: 200px;
+    }
+    
+    .sidebar.collapsed {
+        width: 50px;  /* 从80px缩小到50px */
+        padding: 15px 3px;
+    }
+    
+    .sidebar.collapsed .nav-btn {
+        padding: 10px;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .sidebar.collapsed .menu-toggle {
+        font-size: 1.5rem;
+        width: 36px;
+        height: 36px;
+    }
+    
+    /* 主内容区边距调整 */
+    .main-content {
+        margin-left: 200px;
+        padding: 15px;
+    }
+    
+    .sidebar.collapsed + .main-content {
+        margin-left: 50px;  /* 同步侧边栏折叠宽度 */
+    }
+    
+    /* 首页容器调整 */
+    .homepage-container {
+        padding: 0 10px;
+        height: calc(100vh - 30px);
+    }
+    
+    /* 搜索区域 - 单行紧凑布局 */
+    .search-engine-container {
+        padding: 8px 12px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .search-engine-row {
+        flex-direction: row;
+        gap: 8px;
+        align-items: stretch;
+    }
+    
+    .search-engine-select {
+        width: 80px;
+        min-width: 80px;
+        height: 36px;
+        font-size: 0.85rem;
+        padding: 0 8px;
+    }
+    
+    .search-input {
+        flex: 1;
+        height: 36px;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    
+    .search-btn {
+        width: 40px;
+        height: 36px;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    /* 分类筛选 - 更紧凑 */
+    .category-filter {
+        gap: 6px;
+        margin-bottom: 15px;
+    }
+    
+    .category-filter button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+    
+    /* 书签网格 - 更小卡片 */
+    .bookmark-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 10px;
+    }
+    
+    .bookmark-card {
+        padding: 10px 8px;
+        gap: 8px;
+    }
+    
+    .bookmark-icon {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .bookmark-title {
+        font-size: 0.9rem;
+    }
+    
+    .bookmark-url {
+        font-size: 0.7rem;
+    }
+    
+    /* 工具栏 - 水平紧凑布局 */
+    .toolbar-container {
+        padding: 8px 12px;
+    }
+    
+    .toolbar {
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .toolbar-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+    
+    .toolbar-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+    
+    /* 搜索输入框 - 紧凑样式 */
+    .bookmark-search-input {
+        max-width: 120px;
+        width: 120px;
+        height: 32px;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    /* 内容卡片 */
+    .content-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+}
+
+/* 小屏手机 (< 480px) */
+@media screen and (max-width: 480px) {
+    html {
+        font-size: 12px;
+    }
+    
+    /* 侧边栏 - 更窄 */
+    .sidebar {
+        width: 180px;
+    }
+    
+    .sidebar.collapsed {
+        width: 42px;
+    }
+    
+    .main-content {
+        margin-left: 180px;
+        padding: 8px;
+    }
+    
+    .sidebar.collapsed + .main-content {
+        margin-left: 42px;
+    }
+    
+    /* 导航按钮更紧凑 */
+    .nav-btn {
+        padding: 10px 12px;
+        font-size: 1rem;
+    }
+    
+    /* 搜索区域 - 超紧凑 */
+    .search-engine-container {
+        padding: 6px 8px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
+    
+    .search-engine-row {
+        gap: 6px;
+    }
+    
+    .search-engine-select {
+        width: 60px;
+        min-width: 60px;
+        height: 32px;
+        font-size: 0.75rem;
+        padding: 0 6px;
+    }
+    
+    .search-input {
+        height: 32px;
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+    
+    .search-btn {
+        width: 36px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    
+    /* 分类筛选 - 超紧凑 */
+    .category-filter {
+        gap: 4px;
+        margin-bottom: 10px;
+    }
+    
+    .category-filter button {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+    
+    /* 书签网格 - 两列或更小 */
+    .bookmark-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 8px;
+    }
+    
+    .bookmark-card {
+        padding: 8px 6px;
+        gap: 6px;
+    }
+    
+    /* 头像更小 */
+    .avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    /* 工具栏 - 超紧凑 */
+    .toolbar-container {
+        padding: 6px 8px;
+    }
+    
+    .toolbar {
+        gap: 6px;
+    }
+    
+    .toolbar-group {
+        gap: 4px;
+    }
+    
+    .toolbar-btn {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+    }
+    
+    /* 搜索输入框 - 超紧凑 */
+    .bookmark-search-input {
+        max-width: 100px;
+        width: 100px;
+        height: 28px;
+        padding: 5px 8px;
+        font-size: 0.8rem;
+    }
+}
+
+/*#endregion*/

@@ -10,8 +10,8 @@ const ChangelogPage = (function() {
     function render() {
         return `
             <div class="content-card">
-                <h2>📋 版本信息</h2>
-                <p>V4.0 正式版: 外部html inframe 显示</p>
+                <h2>📋 编辑器（功能开发中）</h2>
+                <p>V5.0  外部html inframe 显示 + 移动端适配</p>
                 <p>2026/03/21</p>
             </div>
         `;

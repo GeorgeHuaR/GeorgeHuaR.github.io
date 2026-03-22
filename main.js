@@ -511,11 +511,15 @@ const ModalManager = {
 //#region AppInitializer 模块
 const AppInitializer = {
     currentPageModule: null,
+    isMobile: false,  // 是否为移动设备
 
     // 初始化应用
     init() {
         document.body.className = AppState.currentTheme;
         Storage.loadInitialData();
+        
+        // 检测是否为移动设备并初始化响应式布局
+        this.initResponsive();
         
         // 动态加载导航按钮[V3.6更新]
         this.renderNavigation();
@@ -539,6 +543,51 @@ const AppInitializer = {
         //     this.setActiveNav(defaultActiveBtn);
         //     this.loadPage('home');
         // }
+    },
+    
+    // ==================== 移动端响应式初始化 ====================
+    /**
+     * 初始化响应式布局
+     * 检测是否为移动设备，自动折叠侧边栏
+     */
+    initResponsive() {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+        
+        // 检测是否为移动设备
+        this.checkMobile();
+        
+        // 初始状态：移动端默认折叠侧边栏
+        if (this.isMobile) {
+            sidebar.classList.add('collapsed');
+        }
+        
+        // 监听窗口大小变化
+        window.addEventListener('resize', () => {
+            const wasMobile = this.isMobile;
+            this.checkMobile();
+            
+            // 从桌面端切换到移动端：自动折叠
+            if (!wasMobile && this.isMobile) {
+                sidebar.classList.add('collapsed');
+            }
+            // 从移动端切换到桌面端：可选展开（根据用户偏好）
+            // 这里保持当前状态，不强制展开
+        });
+    },
+    
+    /**
+     * 检测是否为移动设备
+     * 使用屏幕宽度和 UserAgent 双重检测
+     */
+    checkMobile() {
+        const mobileWidth = 768;  // 与 CSS 媒体查询保持一致
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const isSmallScreen = window.innerWidth <= mobileWidth;
+        const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        this.isMobile = isSmallScreen || (mobileUserAgent && isTouch);
+        return this.isMobile;
     },
     
     /** ---------------------------------------------------

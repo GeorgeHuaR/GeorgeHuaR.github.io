@@ -11,7 +11,7 @@ const AboutPage = (function() {
         return `
             <div class="content-card">
                 <h2>👤 关于我</h2>
-                <p>GeorgeHua 的个人导航站，V4.0 演示版。</p>
+                <p>GeorgeHua 的个人导航站，V5.0 演示版。</p>
             </div>
             <div class="content-card">
                 <h2>🚧 个人项目介绍</h2>
