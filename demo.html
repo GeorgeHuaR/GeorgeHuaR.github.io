@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书签首页 - UI设计演示</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+Pro:wght@400;600&family=Quicksand:wght@400;600;700&family=Nunito:wght@300;400;600&family=Audiowide&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ========== 基础样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            font-family: 'Source Sans Pro', sans-serif;
+            background: #0b1a2f;
+            color: #e8eef2;
+        }
+
+        /* ========== 左侧导航栏（复用原样式） ========== */
+        .sidebar {
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            transition: width 0.4s ease, padding 0.4s ease, margin-left 0.4s ease, background 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 15px;
+            background: rgba(10, 25, 40, 0.8);
+            backdrop-filter: blur(4px);
+            border-right: 1.5px solid rgba(243,179,61,0.3);
+            text-align: center;
+            overflow-x: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: inherit;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .signature {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: opacity 0.2s ease;
+            font-family: 'Playfair Display', serif;
+            color: #f3b33d;
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            text-align: left;
+            padding: 14px 18px;
+            font-size: 1.1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.15s;
+            color: inherit;
+            border: 1.5px solid transparent;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn span:first-child {
+            font-size: 1.4rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .nav-btn.active {
+            background: rgba(243,179,61,0.15);
+            border-color: #f3b33d;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 0.2s;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            margin-bottom: 15px;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            background-color: #f3b33d;
+        }
+
+        .profile-link {
+            font-size: 1rem;
+            opacity: 0.8;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            margin: 10px;
+        }
+
+        .profile-link:hover {
+            opacity: 1;
+        }
+
+        /* ========== 右侧主内容区 ========== */
+        .main-content {
+            flex: 1;
+            padding: 20px 40px;
+            overflow-y: auto;
+            transition: background 0.2s, color 0.2s, margin-left 0.4s ease;
+            margin-left: 240px;
+            position: relative;
+        }
+
+        /* ========== 【新增】书签首页专用容器 ========== */
+        .homepage-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+            gap: 20px;
+        }
+
+        /* ========== 【新增】搜索引擎独立容器 ========== */
+        .search-engine-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 25px 40px;
+            margin-bottom: 10px;
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.2);
+            border-left: 6px solid #f3b33d;
+        }
+
+        .search-engine-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 16px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-engine-select {
+            padding: 12px 40px 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #f3b33d;
+            background: rgba(0,0,0,0.3);
+            background-size: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            min-width: 170px;
+            height: 50px;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+            position: relative;
+            color: white;
+        }
+
+        .search-engine-select:hover {
+            border-color: #f3b33d;
+            background-color: rgba(0,0,0,0.4);
+            box-shadow: 0 0 15px rgba(243,179,61,0.3);
+        }
+
+        .search-engine-select:focus {
+            outline: none;
+            border-color: #f3b33d;
+            box-shadow: 0 0 20px rgba(243,179,61,0.5);
+        }
+
+        .search-input {
+            width: 50%;
+            max-width: 500px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid #f3b33d;
+            background: rgba(0,0,0,0.3);
+            font-size: 1.1rem;
+            color: white;
+            height: 50px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .search-input::placeholder {
+            color: #a19c9c;
+            opacity: 0.8;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #f3b33d;
+            box-shadow: 
+                0 0 20px rgba(243,179,61,0.4),
+                inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .search-btn {
+            border: none;
+            font-size: 1.2rem;
+            background: #f3b33d;
+            color: #0b1a2f;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        .search-btn:hover {
+            background: #f5c05c;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(243,179,61,0.4);
+        }
+
+        /* ========== 【新增】书签内容区（可滚动） ========== */
+        .bookmarks-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* 分类筛选 */
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-filter button {
+            padding: 8px 20px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            color: inherit;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .category-filter button.active {
+            border-color: #f3b33d;
+            font-weight: 600;
+            background: rgba(243,179,61,0.2);
+        }
+
+        .category-filter button:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* 书签网格 */
+        .bookmark-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .bookmark-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid #f3b33d;
+            backdrop-filter: blur(4px);
+            transition: transform 0.15s, box-shadow 0.15s;
+            cursor: pointer;
+        }
+
+        .bookmark-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.06);
+        }
+
+        .bookmark-link {
+            text-decoration: none;
+            color: inherit;
+            outline: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .bookmark-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .bookmark-favicon {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .bookmark-letter {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: inherit;
+            user-select: none;
+        }
+
+        .bookmark-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .bookmark-title {
+            font-weight: 600;
+            font-size: 1rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bookmark-url {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ========== 【新增】底部固定工具栏（使用flexbox布局） ========== */
+        .toolbar-container {
+            background: rgba(10, 25, 40, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(243,179,61,0.3);
+            padding: 15px 40px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toolbar-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            background: rgba(255,255,255,0.1);
+            color: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(243,179,61,0.2);
+            transform: translateY(-2px);
+            border-color: #f3b33d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .toolbar-btn.primary {
+            background: #f3b33d;
+            color: #0b1a2f;
+            font-weight: 600;
+        }
+
+        .toolbar-btn.primary:hover {
+            background: #f5c05c;
+            box-shadow: 0 4px 15px rgba(243,179,61,0.4);
+        }
+
+        .bookmark-search-input {
+            width: 250px;
+            padding: 10px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(243,179,61,0.3);
+            background: rgba(0,0,0,0.3);
+            color: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .bookmark-search-input:focus {
+            border-color: #f3b33d;
+            background: rgba(0,0,0,0.4);
+            box-shadow: 0 0 15px rgba(243,179,61,0.3);
+        }
+
+        .bookmark-search-input::placeholder {
+            color: currentColor;
+            opacity: 0.7;
+        }
+
+        /* 空消息 */
+        .bookmark-grid .empty-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            opacity: 0.6;
+            padding: 40px;
+        }
+
+        /* ========== 自定义滚动条样式（主题色呼应） ========== */
+        .bookmarks-content::-webkit-scrollbar,
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .bookmarks-content::-webkit-scrollbar-track,
+        .main-content::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+
+        .bookmarks-content::-webkit-scrollbar-thumb,
+        .main-content::-webkit-scrollbar-thumb {
+            background: rgba(243,179,61,0.4);
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .bookmarks-content::-webkit-scrollbar-thumb:hover,
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(243,179,61,0.6);
+        }
+
+        .bookmarks-content::-webkit-scrollbar-thumb:active,
+        .main-content::-webkit-scrollbar-thumb:active {
+            background: rgba(243,179,61,0.8);
+        }
+
+        /* Firefox 滚动条样式 */
+        .bookmarks-content,
+        .main-content {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(243,179,61,0.4) rgba(255,255,255,0.05);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 5px;
+            }
+
+            .sidebar .signature,
+            .sidebar .nav-btn span:last-child,
+            .sidebar .sidebar-footer {
+                display: none;
+            }
+
+            .sidebar .nav-btn {
+                justify-content: center;
+                padding: 12px;
+                width: auto;
+                margin: 0 auto;
+                border-radius: 50%;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左侧导航栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <span class="signature">GeorgeHua</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="nav-btn active" data-page="home">
+                <span>🏠</span> <span>主页</span>
+            </button>
+            <button class="nav-btn" data-page="about">
+                <span>👤</span> <span>个人介绍</span>
+            </button>
+            <button class="nav-btn" data-page="changelog">
+                <span>📋</span> <span>版本更新</span>
+            </button>
+            <button class="nav-btn" data-page="settings">
+                <span>⚙️</span> <span>设置</span>
+            </button>
+        </div>
+        <div class="sidebar-footer">
+            <div class="avatar" style="background: linear-gradient(135deg, #f3b33d, #e8a52a);"></div>
+            <a href="#" class="profile-link">🔧 其他</a>
+        </div>
+    </aside>
+
+    <!-- 右侧主内容区 -->
+    <main class="main-content" id="content-area">
+        <div class="homepage-container">
+            <!-- 搜索引擎独立容器 -->
+            <div class="search-engine-container">
+                <div class="search-engine-row">
+                    <select class="search-engine-select" id="searchEngineSelect">
+                        <option value="0">🔍 百度</option>
+                        <option value="1">🔍 Google</option>
+                        <option value="2">🔍 Bing</option>
+                        <option value="3">🔍 DuckDuckGo</option>
+                    </select>
+                    <input type="text" class="search-input" id="searchInput" placeholder="输入关键词开始搜索...">
+                    <button class="search-btn" id="searchBtn">🔍</button>
+                </div>
+            </div>
+
+            <!-- 书签内容区（可滚动） -->
+            <div class="bookmarks-content">
+                <!-- 分类筛选 -->
+                <div class="category-filter" id="categoryFilter">
+                    <button class="active" data-category="all">📑 全部</button>
+                    <button data-category="cat-dev">💻 开发</button>
+                    <button data-category="cat-tools">🛠️ 工具</button>
+                    <button data-category="cat-learn">📚 学习</button>
+                    <button data-category="cat-ent">🎮 娱乐</button>
+                    <button data-category="cat-social">💬 社交</button>
+                    <button data-category="cat-empty">📁 未分类</button>
+                </div>
+
+                <!-- 书签网格 -->
+                <div class="bookmark-grid" id="bookmarkGrid">
+                    <!-- 开发类 -->
+                    <div class="bookmark-card" data-id="1">
+                        <a href="https://github.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">G</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">GitHub</div>
+                                <div class="bookmark-url">github.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="2">
+                        <a href="https://stackoverflow.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">S</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">Stack Overflow</div>
+                                <div class="bookmark-url">stackoverflow.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="3">
+                        <a href="https://developer.mozilla.org" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">M</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">MDN Web Docs</div>
+                                <div class="bookmark-url">developer.mozilla.org</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="4">
+                        <a href="https://codepen.io" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">C</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">CodePen</div>
+                                <div class="bookmark-url">codepen.io</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- 工具类 -->
+                    <div class="bookmark-card" data-id="5">
+                        <a href="https://translate.google.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">T</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">Google 翻译</div>
+                                <div class="bookmark-url">translate.google.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="6">
+                        <a href="https://www.ilovepdf.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">P</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">iLovePDF</div>
+                                <div class="bookmark-url">ilovepdf.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="7">
+                        <a href="https://regex101.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">R</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">Regex101</div>
+                                <div class="bookmark-url">regex101.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="8">
+                        <a href="https://jsonformatter.org" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">J</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">JSON Formatter</div>
+                                <div class="bookmark-url">jsonformatter.org</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- 学习类 -->
+                    <div class="bookmark-card" data-id="9">
+                        <a href="https://www.coursera.org" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">C</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">Coursera</div>
+                                <div class="bookmark-url">coursera.org</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="10">
+                        <a href="https://www.bilibili.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">B</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">哔哩哔哩</div>
+                                <div class="bookmark-url">bilibili.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="11">
+                        <a href="https://www.youtube.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">Y</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">YouTube</div>
+                                <div class="bookmark-url">youtube.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="12">
+                        <a href="https://zh.wikipedia.org" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">W</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">维基百科</div>
+                                <div class="bookmark-url">zh.wikipedia.org</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- 娱乐类 -->
+                    <div class="bookmark-card" data-id="13">
+                        <a href="https://www.netflix.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">N</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">Netflix</div>
+                                <div class="bookmark-url">netflix.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="14">
+                        <a href="https://www.spotify.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">S</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">Spotify</div>
+                                <div class="bookmark-url">spotify.com</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- 社交类 -->
+                    <div class="bookmark-card" data-id="15">
+                        <a href="https://twitter.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">X</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">X (Twitter)</div>
+                                <div class="bookmark-url">twitter.com</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bookmark-card" data-id="16">
+                        <a href="https://www.reddit.com" class="bookmark-link" target="_blank">
+                            <div class="bookmark-icon">
+                                <span class="bookmark-letter">R</span>
+                            </div>
+                            <div class="bookmark-info">
+                                <div class="bookmark-title">Reddit</div>
+                                <div class="bookmark-url">reddit.com</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部工具栏 -->
+            <div class="toolbar-container">
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="manageCategoryBtn">📁 分类管理</button>
+                        <button class="toolbar-btn primary" id="addBookmarkBtn">➕ 添加书签</button>
+                        <button class="toolbar-btn" id="editBookmarkBtn">✏️ 编辑模式</button>
+                    </div>
+                    <div class="toolbar-group">
+                        <input type="text" class="bookmark-search-input" placeholder="🔍 搜索书签...">
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="importDataBtn">📂 导入</button>
+                        <button class="toolbar-btn" id="exportDataBtn">⏬ 导出</button>
+                        <button class="toolbar-btn" id="resetBtn">🔄 重置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 模拟搜索功能
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            const query = document.getElementById('searchInput').value;
+            const engine = document.getElementById('searchEngineSelect');
+            const engineName = engine.options[engine.selectedIndex].text;
+            if (query.trim()) {
+                alert(`使用 ${engineName} 搜索: ${query}`);
+            } else {
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchBtn').click();
+            }
+        });
+
+        // 分类筛选功能
+        const filterButtons = document.querySelectorAll('.category-filter button');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                console.log('切换到分类:', btn.dataset.category);
+            });
+        });
+
+        // 工具栏按钮事件
+        document.getElementById('addBookmarkBtn').addEventListener('click', () => {
+            alert('添加新书签');
+        });
+
+        document.getElementById('editBookmarkBtn').addEventListener('click', () => {
+            alert('进入编辑模式');
+        });
+
+        document.getElementById('manageCategoryBtn').addEventListener('click', () => {
+            alert('管理分类');
+        });
+
+        document.getElementById('importDataBtn').addEventListener('click', () => {
+            alert('导入数据');
+        });
+
+        document.getElementById('exportDataBtn').addEventListener('click', () => {
+            alert('导出数据');
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (confirm('确定要重置所有数据吗？')) {
+                alert('数据已重置');
+            }
+        });
+
+        // 侧边栏折叠功能
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            const mainContent = document.querySelector('.main-content');
+            
+            if (document.getElementById('sidebar').classList.contains('collapsed')) {
+                mainContent.style.marginLeft = '80px';
+            } else {
+                mainContent.style.marginLeft = '240px';
+            }
+        });
+
+        // 导航按钮点击效果
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
