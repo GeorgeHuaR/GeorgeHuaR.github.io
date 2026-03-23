@@ -12,6 +12,7 @@ window.bookmarkData = {
   categories: [
     {"id":"cat-empty","name":"未分类","icon":"📁"},
     {"id":"cat_1","name":"GH首页常用","icon":"🏠"},
+    {"id":"cat_2","name":"AI","icon":"🤖"},
     {"id":"cat_3","name":"学业官方","icon":"🎓"},
     {"id":"cat_4","name":"商城","icon":"🛒"},
     {"id":"cat_5","name":"翻译+论文","icon":"📝"},
@@ -24,13 +25,13 @@ window.bookmarkData = {
     {"id":2,"name":"语雀","url":"https://www.yuque.com/dashboard/notes","description":"","category":"cat_1"},
     {"id":3,"name":"有道翻译","url":"https://dict.youdao.com/","description":"","category":"cat_1"},
     {"id":4,"name":"CSDN_内容中心","url":"https://mp.csdn.net/mp_blog/manage/article","description":"","category":"cat_1"},
-    {"id":5,"name":"Deepseek","url":"https://chat.deepseek.com/","description":"","category":"cat_1"},
-    {"id":6,"name":"元宝","url":"https://yuanbao.tencent.com/chat/naQivTmsDa","description":"","category":"cat_1"},
-    {"id":7,"name":"千问QWEN","url":"https://www.qianwen.com/","description":"","category":"cat_1"},
-    {"id":8,"name":"ChatGPT","url":"https://chatgpt.com/","description":"","category":"cat_8"},
-    {"id":9,"name":"豆包","url":"https://www.doubao.com/chat/","description":"","category":"cat_1"},
-    {"id":10,"name":"Kimi","url":"https://kimi.moonshot.cn/","description":"","category":"cat_1"},
-    {"id":11,"name":"即梦AI-绘图","url":"https://jimeng.jianying.com/ai-tool/home","description":"","category":"cat_8"},
+    {"id":5,"name":"Deepseek","url":"https://chat.deepseek.com/","description":"","category":"cat_2"},
+    {"id":6,"name":"元宝","url":"https://yuanbao.tencent.com/chat/naQivTmsDa","description":"","category":"cat_2"},
+    {"id":7,"name":"千问QWEN","url":"https://www.qianwen.com/","description":"","category":"cat_2"},
+    {"id":8,"name":"ChatGPT","url":"https://chatgpt.com/","description":"","category":"cat_2"},
+    {"id":9,"name":"豆包","url":"https://www.doubao.com/chat/","description":"","category":"cat_2"},
+    {"id":10,"name":"Kimi","url":"https://kimi.moonshot.cn/","description":"","category":"cat_2"},
+    {"id":11,"name":"即梦AI-绘图","url":"https://jimeng.jianying.com/ai-tool/home","description":"","category":"cat_2"},
     {"id":12,"name":"上网登录","url":"https://xha.ouc.edu.cn/","description":"","category":"cat_3"},
     {"id":13,"name":"研究生信息门户","url":"https://my.ouc.edu.cn/#/home","description":"","category":"cat_3"},
     {"id":14,"name":"培养方案","url":"https://pgs.ouc.edu.cn/py/page/student/ckgrxxjh.htm","description":"","category":"cat_3"},
@@ -60,6 +61,6 @@ window.bookmarkData = {
     {"id":38,"name":"简谱之家","url":"https://www.jianpu.net/jianpu/","description":"","category":"cat_8"},
     {"id":39,"name":"在线PDF编辑","url":"https://www.ilovepdf.com/zh-cn","description":"","category":"cat_8"},
     {"id":40,"name":"KS串口助手","url":"https://serial.baud-dance.com/#/","description":"","category":"cat_8"},
-    {"id":42,"name":"图片工具（在线）","url":"https://docsmall.com/image-compress","description":"在线图片压缩、该尺寸等","category":"cat_8"}
+    {"id":41,"name":"在线多媒体工具","url":"https://www.67tool.com/","description":"","category":"cat_8"}
   ]
 };
