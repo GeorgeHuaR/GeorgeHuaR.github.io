@@ -330,7 +330,7 @@ const DataOperations = {
     // 更新书签
     updateBookmark(id, updates) {
         const data = Storage.getAppData();
-        const index = data.bookmarks.findIndex(b => b.id === id);
+        const index = data.bookmarks.findIndex(b => b.id == id);
         if (index !== -1) {
             data.bookmarks[index] = { ...data.bookmarks[index], ...updates };
             Storage.saveAppData(data);
@@ -342,8 +342,8 @@ const DataOperations = {
     // 批量删除书签
     deleteBookmarks(ids) {
         const data = Storage.getAppData();
-        const idsToDelete = new Set(ids);
-        data.bookmarks = data.bookmarks.filter(b => !idsToDelete.has(b.id));
+        const idsToDelete = new Set(ids.map(id => id.toString()));
+        data.bookmarks = data.bookmarks.filter(b => !idsToDelete.has(b.id.toString()));
         Storage.saveAppData(data);
         return data.bookmarks;
     },
@@ -352,7 +352,7 @@ const DataOperations = {
     batchUpdateCategory(ids, category) {
         const data = Storage.getAppData();
         ids.forEach(id => {
-            const index = data.bookmarks.findIndex(b => b.id === id);
+            const index = data.bookmarks.findIndex(b => b.id == id);
             if (index !== -1) data.bookmarks[index].category = category;
         });
         Storage.saveAppData(data);
@@ -481,13 +481,14 @@ const ModalManager = {
         document.getElementById('modal-save').addEventListener('click', () => {
             const newCategory = document.getElementById('modal-category').value;
             const selectedIds = selectedBookmarks.map(b => b.id);
+            // 更新分类数据
             DataOperations.batchUpdateCategory(selectedIds, newCategory);
             document.body.removeChild(overlay);
-            // 刷新页面保持编辑模式
-            AppState.setEditMode(false);
+            // 刷新页面，保持编辑模式
+            // AppState.setEditMode(false);
             AppInitializer.loadPage('home');
             AppState.setEditMode(true);
-            AppInitializer.loadPage('home');
+            // AppInitializer.loadPage('home');
         });
         document.getElementById('modal-cancel').addEventListener('click', () => document.body.removeChild(overlay));
         overlay.addEventListener('click', (e) => { if (e.target === overlay) document.body.removeChild(overlay); });

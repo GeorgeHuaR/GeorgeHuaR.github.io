@@ -28,7 +28,7 @@ const HomePage = (function() {
     // 更新分类
     function updateCategory(id, updates) {
         const data = window.CoreModules.Storage.getAppData();
-        const index = data.categories.findIndex(c => c.id === id);
+        const index = data.categories.findIndex(c => c.id == id);
         if (index !== -1) {
             data.categories[index] = { ...data.categories[index], ...updates };
             window.CoreModules.Storage.saveAppData(data);
@@ -245,6 +245,7 @@ const HomePage = (function() {
     //#endregion
 
     // ==================== 页面渲染相关函数 ====================
+    //#region 页面渲染
     // 渲染页面 HTML 结构（静态骨架）
     function render() {
         // 根据编辑模式生成不同的工具栏
@@ -334,7 +335,7 @@ const HomePage = (function() {
         ).join('');
     }
 
-    // 渲染书签网格
+    // #region渲染书签网格
     function renderBookmarkGrid() {
         const container = document.getElementById('bookmarkGrid');
         if (!container) return;
@@ -443,6 +444,7 @@ const HomePage = (function() {
         }
     }
 
+    // #region 绑定事件
     // 绑定分类筛选事件
     function bindCategoryFilterEvents() {
         if (window.CoreModules.AppState.isEditMode) return;
@@ -489,7 +491,7 @@ const HomePage = (function() {
         });
     }
 
-    // 绑定工具栏事件
+    // #region 绑定工具栏事件
     function bindToolbarEvents() {
         const isEditMode = window.CoreModules.AppState.isEditMode;
 

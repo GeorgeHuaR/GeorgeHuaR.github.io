@@ -165,6 +165,22 @@ trea 重构homePage.js 的render与init函数, 结构更清晰（解决重复调
   - ✅搜索引擎相关功能单独一个容器，与书签网格分离 + UI美化
     css大纲同步修改
 
+## V5.1.3 修复书签编辑功能的Bug
+- 批量修改分类后，导出的书签竟然没变化！
+
+- 问题描述：
+    附件homePage.js中的“批量修改分类”功能测试有Bug：编辑模式修改书签分类后，页面显示的分类书签变化，但是导出data.js中的书签分类数据没变。单条书签数据如下：
+    {"id":1,"name":"BiliBili","url":"https://www.bilibili.com/","description":"","category":"cat_1"},
+    猜测可能是main.js中的相关功能函数有问题，请帮我排查问题成因
+
+```
+  问题原因 ：当从 localStorage 读取数据时，数字类型的 ID 会被转换为字符串类型，但 batchUpdateCategory 函数使用严格相等运算符 === 比较 ID，导致数字和字符串不匹配，从而找不到要更新的书签。  
+    - 修复了 batchUpdateCategory 函数 （main.js:355）：将 === 改为 == ，以便在比较 ID 时忽略类型差异
+    - 修复了 deleteBookmarks 函数 （main.js:345-346）：将所有 ID 转换为字符串类型，确保类型匹配
+    - 修复了 updateBookmark 函数 （main.js:333）：将 === 改为 == ，以便在比较 ID 时忽略类型差异
+```
+- 备注：  
+  其他主流AI都没发现这个Bug!
 
 # V6.0 编辑器
 
