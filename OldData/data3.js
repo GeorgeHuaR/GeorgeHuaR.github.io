@@ -63,8 +63,6 @@ window.bookmarkData = {
     {"id":40,"name":"KS串口助手","url":"https://serial.baud-dance.com/#/","description":"","category":"cat_8"},
     {"id":42,"name":"图片工具（在线）","url":"https://docsmall.com/image-compress","description":"在线图片压缩、该尺寸等","category":"cat_8"},
     {"id":43,"name":"立创阻抗计算器","url":"https://tools.jlc.com/jlcTools/index.html#/impedanceCalculatenew","description":"","category":"cat_8"},
-    {"id":44,"name":"王雷的网站","url":"https://wangli-pvy6.onrender.com/","description":"","category":"cat-empty"},
-    {"id":47,"name":"WinForm开发 net48","url":"https://learn.microsoft.com/zh-cn/dotnet/desktop/winforms/overview/?view=netframeworkdesktop-4.8","description":"","category":"cat_6"},
-    {"id":48,"name":"2FA","url":"https://2fa.vip/","description":"","category":"cat_8"}
+    {"id":44,"name":"王雷的网站","url":"https://wangli-pvy6.onrender.com/","description":"","category":"cat-empty"}
   ]
 };

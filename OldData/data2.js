@@ -25,8 +25,6 @@ window.bookmarkData = {
     {"id":4,"name":"CSDN_内容中心","url":"https://mp.csdn.net/mp_blog/manage/article","description":"","category":"cat_1"},
     {"id":31,"name":"Github","url":"https://github.com/GeorgeHuaR?tab=repositories","description":"","category":"cat_1"},
     {"id":5,"name":"Deepseek","url":"https://chat.deepseek.com/","description":"","category":"cat_1"},
-    {"id":45,"name":"Gemini","url":"https://gemini.google.com/app","description":"","category":"cat_1"},
-    {"id":46,"name":"AI Studio","url":"https://aistudio.google.com/apps","description":"","category":"cat_1"},
     {"id":6,"name":"元宝","url":"https://yuanbao.tencent.com/chat/naQivTmsDa","description":"","category":"cat_1"},
     {"id":9,"name":"豆包","url":"https://www.doubao.com/chat/","description":"","category":"cat_1"},
     {"id":7,"name":"千问QWEN","url":"https://www.qianwen.com/","description":"","category":"cat_1"},
@@ -62,9 +60,6 @@ window.bookmarkData = {
     {"id":39,"name":"在线PDF编辑","url":"https://www.ilovepdf.com/zh-cn","description":"","category":"cat_8"},
     {"id":40,"name":"KS串口助手","url":"https://serial.baud-dance.com/#/","description":"","category":"cat_8"},
     {"id":42,"name":"图片工具（在线）","url":"https://docsmall.com/image-compress","description":"在线图片压缩、该尺寸等","category":"cat_8"},
-    {"id":43,"name":"立创阻抗计算器","url":"https://tools.jlc.com/jlcTools/index.html#/impedanceCalculatenew","description":"","category":"cat_8"},
-    {"id":44,"name":"王雷的网站","url":"https://wangli-pvy6.onrender.com/","description":"","category":"cat-empty"},
-    {"id":47,"name":"WinForm开发 net48","url":"https://learn.microsoft.com/zh-cn/dotnet/desktop/winforms/overview/?view=netframeworkdesktop-4.8","description":"","category":"cat_6"},
-    {"id":48,"name":"2FA","url":"https://2fa.vip/","description":"","category":"cat_8"}
+    {"id":43,"name":"立创阻抗计算器","url":"https://tools.jlc.com/jlcTools/index.html#/impedanceCalculatenew","description":"","category":"cat_8"}
   ]
 };
