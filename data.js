@@ -26,6 +26,7 @@ window.bookmarkData = {
     {"id":31,"name":"Github","url":"https://github.com/GeorgeHuaR?tab=repositories","description":"","category":"cat_1"},
     {"id":5,"name":"Deepseek","url":"https://chat.deepseek.com/","description":"","category":"cat_1"},
     {"id":45,"name":"Gemini","url":"https://gemini.google.com/app","description":"","category":"cat_1"},
+    {"id":49,"name":"GPT","url":"https://chatgpt.com/","description":"GPT-codex救救我","category":"cat_1"},
     {"id":46,"name":"AI Studio","url":"https://aistudio.google.com/apps","description":"","category":"cat_1"},
     {"id":6,"name":"元宝","url":"https://yuanbao.tencent.com/chat/naQivTmsDa","description":"","category":"cat_1"},
     {"id":9,"name":"豆包","url":"https://www.doubao.com/chat/","description":"","category":"cat_1"},
@@ -65,6 +66,6 @@ window.bookmarkData = {
     {"id":43,"name":"立创阻抗计算器","url":"https://tools.jlc.com/jlcTools/index.html#/impedanceCalculatenew","description":"","category":"cat_8"},
     {"id":44,"name":"王雷的网站","url":"https://wangli-pvy6.onrender.com/","description":"","category":"cat-empty"},
     {"id":47,"name":"WinForm开发 net48","url":"https://learn.microsoft.com/zh-cn/dotnet/desktop/winforms/overview/?view=netframeworkdesktop-4.8","description":"","category":"cat_6"},
-    {"id":48,"name":"2FA","url":"https://2fa.vip/","description":"","category":"cat_8"}
+    {"id":48,"name":"2FA","url":"https://2fa.vip/","description":"","category":"cat_8"},
   ]
 };
