@@ -6,6 +6,7 @@
     - Storage: 数据持久化
     - DataOperations: 数据操作
     - ModalManager: 弹窗管理
+    - ToastManager: 非阻塞提示管理
     - AppInitializer: 应用初始化
 */ 
 
@@ -236,52 +237,143 @@ const Utils = {
 // ==================== 3. Storage - 数据持久化 ====================
 //#region Storage 模块
 const Storage = {
-    // 加载初始数据，优先从 localStorage 读取
+    /**
+     * V6.1.1：从 data.js 创建运行时默认数据副本。
+     * data.js 使用 VERSION 字段，localStorage 运行时统一使用 version 字段。
+     */
+    createDefaultData() {
+        return this.toRuntimeData(window.bookmarkData || {});
+    },
+
+    /**
+     * V6.1.1：生成用户在浏览器内修改书签/分类后的数据版本。
+     * 版本用于 Reset 前提示是否需要导出，不参与页面刷新时的数据源选择。
+     */
+    createDataVersion(date = new Date()) {
+        const pad = value => String(value).padStart(2, '0');
+        return [
+            date.getFullYear(),
+            pad(date.getMonth() + 1),
+            pad(date.getDate())
+        ].join('-') + '_' + [
+            pad(date.getHours()),
+            pad(date.getMinutes()),
+            pad(date.getSeconds())
+        ].join('-');
+    },
+
+    /**
+     * V6.1.1：将 data.js/导入数据转换成 localStorage 使用的运行时结构。
+     * 这里只处理当前项目的固定字段，不引入复杂兼容层。
+     */
+    toRuntimeData(rawData = {}) {
+        const data = {
+            version: rawData.version || rawData.VERSION || window.bookmarkData.VERSION,
+            searchEngines: Array.isArray(rawData.searchEngines) ? rawData.searchEngines.map(item => ({ ...item })) : [],
+            categories: Array.isArray(rawData.categories) ? rawData.categories.map(item => ({ ...item })) : [],
+            bookmarks: Array.isArray(rawData.bookmarks) ? rawData.bookmarks.map(item => ({ ...item })) : []
+        };
+
+        this.ensureUncategorizedCategory(data);
+        return data;
+    },
+
+    /**
+     * V6.1.1：最小数据检查，避免导入明显不是书签数据的文件。
+     * 个人本地项目不做复杂 schema 校验，字段细节仍由当前 UI 操作保证。
+     */
+    isUsableAppData(data) {
+        return !!(
+            data &&
+            Array.isArray(data.searchEngines) &&
+            Array.isArray(data.categories) &&
+            Array.isArray(data.bookmarks)
+        );
+    },
+
+    /**
+     * V6.1.1：解析项目约定的 data.js 导入格式。
+     * 这里保留简单解析方式，前提是只导入自己导出的或可信任的 data.js 文件。
+     */
+    parseBookmarkDataContent(content) {
+        const match = content.match(/window\.bookmarkData\s*=\s*(\{[\s\S]*?\});/);
+        if (!match) {
+            throw new Error('未找到 window.bookmarkData 定义');
+        }
+
+        return new Function('return ' + match[1])();
+    },
+
+    // V6.1.1：加载时只判断 localStorage 是否存在；存在则保留用户运行时数据。
     loadInitialData() {
         const stored = localStorage.getItem('bookmarkAppData');
         if (stored) {
             try {
-                const data = JSON.parse(stored);
-                // 检查版本是否一致
-                if (data.version === window.bookmarkData.VERSION) return data;
-            } catch (e) {}
+                const data = this.toRuntimeData(JSON.parse(stored));
+                if (this.isUsableAppData(data)) {
+                    return data;
+                }
+            } catch (e) {
+                console.warn('本地书签数据解析失败，已回退到默认数据:', e);
+            }
         }
-        // 无存储或版本不一致，使用静态数据
-        const initialData = {
-            version: window.bookmarkData.VERSION,
-            searchEngines: window.bookmarkData.searchEngines,
-            categories: window.bookmarkData.categories,
-            bookmarks: window.bookmarkData.bookmarks
-        };
+        // 无本地运行时数据时，使用 data.js 默认数据初始化。
+        const initialData = this.createDefaultData();
         this.saveAppData(initialData);
-        this.ensureUncategorizedCategory(initialData);
         return initialData;
     },
     
-    // 预处理空分类的书签
+    // V6.1.1：预处理空分类，统一归入当前 data.js 中的 cat-empty。
     ensureUncategorizedCategory(data) {
         data.bookmarks.forEach(bookmark => {
-            if (!bookmark.category || bookmark.category === '') bookmark.category = 'empty';
+            if (!bookmark.category || bookmark.category === '') {
+                bookmark.category = 'cat-empty';
+            }
         });
         return data;
     },
 
-    getAppData() { return JSON.parse(localStorage.getItem('bookmarkAppData')); },
-    saveAppData(data) { localStorage.setItem('bookmarkAppData', JSON.stringify(data)); },
+    getAppData() {
+        const stored = localStorage.getItem('bookmarkAppData');
+        if (!stored) return this.loadInitialData();
+
+        try {
+            const data = this.toRuntimeData(JSON.parse(stored));
+            if (!this.isUsableAppData(data)) {
+                throw new Error('本地数据结构不完整');
+            }
+            return data;
+        } catch (e) {
+            console.warn('读取本地书签数据失败，已重置为默认数据:', e);
+            return this.resetToDefault();
+        }
+    },
+
+    /**
+     * V6.1.1：保存运行时数据。
+     * 只有用户通过界面修改书签/分类时传入 markModified，才更新时间版本用于 Reset 提示。
+     */
+    saveAppData(data, options = {}) {
+        const runtimeData = this.toRuntimeData(data);
+        if (options.markModified) {
+            runtimeData.version = this.createDataVersion();
+        }
+
+        localStorage.setItem('bookmarkAppData', JSON.stringify(runtimeData));
+        return runtimeData;
+    },
     
     // 导入数据文件
     importDataFile(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
             const content = e.target.result;
-            const match = content.match(/window\.bookmarkData\s*=\s*(\{[\s\S]*?\});/);
-            if (!match) { alert('无法解析文件：未找到 window.bookmarkData 定义'); return; }
             try {
-                const data = new Function('return ' + match[1])();
-                if (!data.version || !data.searchEngines || !data.categories || !data.bookmarks) {
+                const importedData = this.toRuntimeData(this.parseBookmarkDataContent(content));
+                if (!this.isUsableAppData(importedData)) {
                     alert('数据格式不完整，导入失败'); return;
                 }
-                this.saveAppData(data);
+                this.saveAppData(importedData);
                 AppInitializer.refreshCurrentPage();
                 alert('导入成功，当前数据已更新');
             } catch (err) { alert('解析数据失败：' + err.message); }
@@ -306,10 +398,19 @@ const Storage = {
         a.click();
         URL.revokeObjectURL(url);
     },
+
+    /**
+     * V6.1.1：Reset 前只用版本判断是否提示导出。
+     * 版本不同表示浏览器运行时数据可能未同步回 data.js。
+     */
+    shouldWarnBeforeReset(data = this.getAppData()) {
+        return data.version !== window.bookmarkData.VERSION;
+    },
     
     resetToDefault() {
-        localStorage.removeItem('bookmarkAppData');
-        return this.loadInitialData();
+        const defaultData = this.createDefaultData();
+        this.saveAppData(defaultData);
+        return defaultData;
     }
 };
 //#endregion
@@ -323,7 +424,8 @@ const DataOperations = {
         const newId = data.bookmarks.length > 0 ? Math.max(...data.bookmarks.map(b => b.id)) + 1 : 1;
         const newBookmark = { id: newId, ...bookmark };
         data.bookmarks.push(newBookmark);
-        Storage.saveAppData(data);
+        // V6.1.1：用户通过界面新增书签后更新时间版本，用于 Reset 前提示导出。
+        Storage.saveAppData(data, { markModified: true });
         return newBookmark;
     },
     
@@ -333,7 +435,8 @@ const DataOperations = {
         const index = data.bookmarks.findIndex(b => b.id == id);
         if (index !== -1) {
             data.bookmarks[index] = { ...data.bookmarks[index], ...updates };
-            Storage.saveAppData(data);
+            // V6.1.1：用户通过界面编辑书签后更新时间版本，用于 Reset 前提示导出。
+            Storage.saveAppData(data, { markModified: true });
             return data.bookmarks[index];
         }
         return null;
@@ -344,7 +447,8 @@ const DataOperations = {
         const data = Storage.getAppData();
         const idsToDelete = new Set(ids.map(id => id.toString()));
         data.bookmarks = data.bookmarks.filter(b => !idsToDelete.has(b.id.toString()));
-        Storage.saveAppData(data);
+        // V6.1.1：用户通过界面删除书签后更新时间版本，用于 Reset 前提示导出。
+        Storage.saveAppData(data, { markModified: true });
         return data.bookmarks;
     },
     
@@ -355,7 +459,8 @@ const DataOperations = {
             const index = data.bookmarks.findIndex(b => b.id == id);
             if (index !== -1) data.bookmarks[index].category = category;
         });
-        Storage.saveAppData(data);
+        // V6.1.1：用户通过界面批量修改分类后更新时间版本，用于 Reset 前提示导出。
+        Storage.saveAppData(data, { markModified: true });
         return data.bookmarks;
     },
     
@@ -364,6 +469,7 @@ const DataOperations = {
         if (category === 'all') {
             return bookmarks;
         } else if (category === 'cat-empty') {
+            // V6.1.1：当前分类约定统一使用 cat-empty，不再保留历史 empty 分支。
             return bookmarks.filter(b => !b.category || b.category === '' || b.category === 'cat-empty');
         } else {
             return bookmarks.filter(b => b.category === category);
@@ -502,6 +608,48 @@ const ModalManager = {
             DataOperations.deleteBookmarks(selectedIds);
             AppInitializer.loadPage('home');
         }
+    }
+};
+//#endregion
+
+// ==================== 6. ToastManager - 非阻塞提示管理 ====================
+//#region ToastManager 模块
+const ToastManager = {
+    /**
+     * V6.1.1：显示非阻塞提示，用于 Reset 成功等无需用户确认的反馈。
+     * @param {string} message - 提示文本
+     * @param {'info'|'success'|'warning'} type - 提示类型
+     * @param {number} duration - 自动消失时间，单位毫秒
+     */
+    show(message, type = 'info', duration = 1000) {
+        const container = this.getContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast-message ${type}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+
+        // 先插入 DOM 再触发可见状态，保证 CSS 过渡动画生效。
+        requestAnimationFrame(() => toast.classList.add('visible'));
+
+        setTimeout(() => {
+            toast.classList.remove('visible');
+            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+        }, duration);
+    },
+
+    /**
+     * V6.1.1：复用全局 Toast 容器，避免每次提示都创建固定定位节点。
+     * @returns {HTMLElement}
+     */
+    getContainer() {
+        let container = document.getElementById('toastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+        return container;
     }
 };
 //#endregion
@@ -795,13 +943,14 @@ const AppInitializer = {
 // ==================== 8. 全局导出与初始化 ====================
 //#region 全局导出与初始化
 // 导出核心模块到 CoreModules 命名空间
-window.CoreModules = { AppState, Utils, Storage, DataOperations, ModalManager, AppInitializer };
+window.CoreModules = { AppState, Utils, Storage, DataOperations, ModalManager, ToastManager, AppInitializer };
 // 同时导出到全局变量，保持向后兼容
 window.AppState = AppState;
 window.Utils = Utils;
 window.Storage = Storage;
 window.DataOperations = DataOperations;
 window.ModalManager = ModalManager;
+window.ToastManager = ToastManager;
 window.AppInitializer = AppInitializer;
 
 // 延迟初始化，等待所有脚本（包括 Pages 文件夹里的页面模块）加载完成

@@ -1,6 +1,6 @@
-// 导出自定义书签数据 (版本 V1.1)
+// 导出自定义书签数据 (版本 2026-06-15_21-10-19)
 window.bookmarkData = {
-  VERSION: 'V1.1',
+  VERSION: '2026-06-15_21-10-19',
   searchEngines: [
     {"name":"Bing","url":"https://cn.bing.com/search?q="},
     {"name":"Baidu","url":"https://www.baidu.com/s?wd="},

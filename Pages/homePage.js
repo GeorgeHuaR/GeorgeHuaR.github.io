@@ -21,7 +21,8 @@ const HomePage = (function() {
             icon: category.icon || '📁'
         };
         data.categories.push(newCategory);
-        window.CoreModules.Storage.saveAppData(data);
+        // V6.1.1：用户通过界面新增分类后更新时间版本，用于 Reset 前提示导出。
+        window.CoreModules.Storage.saveAppData(data, { markModified: true });
         return newCategory;
     }
 
@@ -31,7 +32,8 @@ const HomePage = (function() {
         const index = data.categories.findIndex(c => c.id == id);
         if (index !== -1) {
             data.categories[index] = { ...data.categories[index], ...updates };
-            window.CoreModules.Storage.saveAppData(data);
+            // V6.1.1：用户通过界面编辑分类后更新时间版本，用于 Reset 前提示导出。
+            window.CoreModules.Storage.saveAppData(data, { markModified: true });
             return data.categories[index];
         }
         return null;
@@ -53,7 +55,8 @@ const HomePage = (function() {
         });
         // 删除分类
         data.categories = data.categories.filter(c => c.id !== id);
-        window.CoreModules.Storage.saveAppData(data);
+        // V6.1.1：用户通过界面删除分类后更新时间版本，用于 Reset 前提示导出。
+        window.CoreModules.Storage.saveAppData(data, { markModified: true });
         return true;
     }
 
@@ -563,28 +566,20 @@ const HomePage = (function() {
 
             // 重置数据按钮点击事件
             document.getElementById('resetBtn').addEventListener('click', () => {
-                const currentData = window.CoreModules.Storage.getAppData();
-                const defaultData = {
-                    version: window.bookmarkData.VERSION,
-                    searchEngines: window.bookmarkData.searchEngines,
-                    categories: window.bookmarkData.categories,
-                    bookmarks: window.bookmarkData.bookmarks
-                };
-                if (!window.CoreModules.Utils.isDataEqual(currentData, defaultData)) {
-                    if (confirm('⚠️当前书签数据已修改，确定要重置吗❓')) {
-                        window.CoreModules.Storage.resetToDefault();
-                        if (window.CoreModules.AppInitializer) {
-                            window.CoreModules.AppInitializer.loadPage('home');
-                        }
-                    }
-                } else {
-                    if (confirm('⚠️确定重置书签？')) {
-                        window.CoreModules.Storage.resetToDefault();
-                        if (window.CoreModules.AppInitializer) {
-                            window.CoreModules.AppInitializer.loadPage('home');
-                        }
-                    }
+                const storage = window.CoreModules.Storage;
+                const currentData = storage.getAppData();
+                // V6.1.1：Reset 只比较运行时版本与 data.js 版本；不一致时提示导出，版本一致则直接重载默认数据。
+                if (storage.shouldWarnBeforeReset(currentData)) {
+                    const confirmed = confirm('⚠️当前浏览器书签版本与 data.js 不一致，可能存在未导出的修改。确定重置为 data.js 默认数据吗？');
+                    if (!confirmed) return;
                 }
+
+                storage.resetToDefault();
+                if (window.CoreModules.AppInitializer) {
+                    window.CoreModules.AppInitializer.loadPage('home');
+                }
+                // V6.1.1：Reset 成功后使用非阻塞 Toast 提示，避免版本一致时缺少操作反馈。
+                window.CoreModules.ToastManager?.show('书签已重置为 data.js 默认数据', 'success');
             });
         }
     }
