@@ -17,7 +17,7 @@ const AppState = {
     isEditMode: false,
     selectedIds: new Set(),
     currentFilterCategory: 'cat_1',
-    currentTheme: localStorage.getItem('navTheme') || 'theme-modern',
+    currentTheme: localStorage.getItem('navTheme') || 'theme-glass',
     currentSearchQuery: '',
 
     // ==================== 图标相关状态 ====================
@@ -848,8 +848,9 @@ const AppInitializer = {
     loadModulePage(config, container) {
         const module = window.PageModules?.[config.moduleName];
         if (!module) {
+            // V6.1.2：模块页当前采用预加载脚本方案，缺失时优先检查 index.html 是否引入对应 Pages/*.js。
             console.error(`页面模块未找到: ${config.moduleName} (页面: ${config.id})`);
-            this.showErrorPage(`页面“${config.name}”加载失败`);
+            this.showErrorPage(`页面“${config.name}”加载失败，请检查 PageConfig.js 的 moduleName 与 index.html 的页面脚本引入是否一致。`);
             return;
         }
         

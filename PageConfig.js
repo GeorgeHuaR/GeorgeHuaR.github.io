@@ -2,8 +2,9 @@
 (function() {
     /**
      * 页面配置列表
-     * @instruction  内嵌html页面：需要修改type和src属性
-     * 修改导航按钮后，需要同步修改html的js导入
+     * @instruction  内嵌 html 页面：使用 type: 'iframe' 并配置 src 属性。
+     * V6.1.2：当前暂不启用页面脚本懒加载；新增 module 页面时，需要同步在 index.html 中引入对应 Pages/*.js。
+     * V6.1.2：moduleName 必须与页面脚本最终注册到 window.PageModules 的名称一致，否则路由无法找到页面模块。
      */
 
     /** ---------------------------------------------------
@@ -49,7 +50,7 @@
         //     moduleName: 'ToolsPage'
         // },
         
-        // 内嵌html页面：需要修改type和src属性
+        // V6.1.2：iframe 页面只需要配置 src，不需要在 index.html 中新增页面模块脚本。
         {
             id: 'calculator',
             name: '外部主页',

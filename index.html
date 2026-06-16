@@ -11,7 +11,7 @@
  
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-modern">
+<body class="theme-glass">
     <!-- 左侧导航栏 -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -47,15 +47,16 @@
 
     <!-- 引入 JS 文件，注意顺序：
          1. data.js - 定义基础数据
-         2. main.js - 核心模块（定义 CoreModules）
-         3. 页面模块 - 依赖 CoreModules
+         2. PageConfig.js - 定义导航和页面路由配置
+         3. main.js - 核心模块（定义 CoreModules）
+         4. 页面模块 - 依赖 CoreModules，并需要与 PageConfig.js 中的 moduleName 保持一致
     -->
     <script src="data.js"></script>
     <script src="PageConfig.js"></script>
     
     <!-- 核心功能（必须先于页面模块加载） -->
     <script src="main.js"></script>
-    <!-- 页面模块（依赖 main.js 中的 CoreModules） -->
+    <!-- V6.1.2：当前暂不启用懒加载；新增 module 页面时，需要在 PageConfig.js 注册并在此处同步引入脚本。 -->
     <script src="Pages/homePage.js"></script>
     <script src="Pages/aboutPage.js"></script>
     <script src="Pages/changelogPage.js"></script>
