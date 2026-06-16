@@ -163,13 +163,15 @@ const SettingsPage = (function() {
      */
     function renderThemePanel() {
         const currentTheme = window.CoreModules.AppState.currentTheme;
+        // 【V6.3.3】主题按钮由简化主题清单生成，只展示 label，避免按钮图标和手写 class 增加维护成本。
+        const themeButtons = window.CoreModules.THEME_OPTIONS
+            .map(theme => `<button class="theme-btn" data-theme="${theme.className}">${theme.label}</button>`)
+            .join('');
         return `
             <div class="content-card settings-container">
                 <h2>🎨 主题设置</h2>
                 <div class="theme-options">
-                    <button class="theme-btn modern" data-theme="theme-modern">📰 现代编辑</button>
-                    <button class="theme-btn glass" data-theme="theme-glass">🥛 柔和玻璃</button>
-                    <button class="theme-btn tech" data-theme="theme-tech">💻 科技</button>
+                    ${themeButtons}
                 </div>
                 <p class="current-theme-text">当前主题：<span id="current-theme-label">${window.CoreModules.Utils.getThemeName(currentTheme)}</span></p>
             </div>
@@ -205,6 +207,7 @@ const SettingsPage = (function() {
                 if (window.CoreModules.AppInitializer) {
                     window.CoreModules.AppInitializer.setTheme(btn.dataset.theme);
                     updateThemeButtonsActive(btn.dataset.theme);
+                    updateCurrentThemeLabel(btn.dataset.theme);
                 }
             });
         });
@@ -282,6 +285,13 @@ const SettingsPage = (function() {
         document.querySelectorAll('.theme-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.theme === currentTheme);
         });
+    }
+
+    function updateCurrentThemeLabel(currentTheme) {
+        const label = document.getElementById('current-theme-label');
+        if (label) {
+            label.textContent = window.CoreModules.Utils.getThemeName(currentTheme);
+        }
     }
     //#endregion
     

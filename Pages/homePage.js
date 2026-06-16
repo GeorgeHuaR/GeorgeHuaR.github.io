@@ -289,11 +289,11 @@ const HomePage = (function() {
         return `
             <div class="homepage-container">
                 <div class="search-engine-container">
-                    <div class="search-engine-row">
-                        <select class="search-engine-select" id="searchEngineSelect"></select>
-                        <input type="text" class="search-input" id="searchInput" placeholder="输入关键词...">
-                        <button class="search-btn" id="searchBtn">🔍</button>
-                    </div>
+                    <form class="web-search" id="webSearchForm" role="search" aria-label="网页搜索">
+                        <select class="search-engine-select" id="searchEngineSelect" aria-label="选择搜索引擎"></select>
+                        <input type="text" class="search-input" id="searchInput" placeholder="输入关键词..." aria-label="搜索关键词">
+                        <button class="search-btn" id="searchBtn" type="submit" aria-label="搜索" title="搜索">🔍</button>
+                    </form>
                 </div>
                 <div class="bookmarks-content">
                     <div class="category-filter" id="categoryFilter"></div>
@@ -465,11 +465,13 @@ const HomePage = (function() {
 
     // 绑定搜索引擎事件
     function bindSearchEvents() {
+        const searchForm = document.getElementById('webSearchForm');
         const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
         const engineSelect = document.getElementById('searchEngineSelect');
+        if (!searchForm || !searchInput || !engineSelect) return;
 
-        function performSearch() {
+        function performSearch(e) {
+            if (e) e.preventDefault();
             const query = searchInput.value.trim();
             if (!query) return;
             const engineIdx = engineSelect.value;
@@ -477,10 +479,7 @@ const HomePage = (function() {
             window.open(engine.url + encodeURIComponent(query), '_blank');
         }
 
-        searchBtn.addEventListener('click', performSearch);
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') performSearch();
-        });
+        searchForm.addEventListener('submit', performSearch);
     }
 
     // 绑定书签搜索事件

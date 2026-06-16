@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主题风格展示 Demo2</title>
+    <!--
+      demo2.html
+      主题风格展示页：用于独立验证候选风格主题，不参与主应用运行逻辑。
+      当前候选：插画风格、浅色现代、经典拟物、玻璃精修。
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700;900&family=Quicksand:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: var(--font-body);
+            color: var(--text);
+            background: var(--app-bg);
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr) 300px;
+            transition: background 0.2s ease, color 0.2s ease;
+            --app-bg: #f4f7fb;
+            --text: #263238;
+            --muted: #65727d;
+            --accent: #2f7df6;
+            --accent-soft: rgba(47, 125, 246, 0.12);
+            --on-accent: #fff;
+            --panel: #fff;
+            --panel-strong: #fff;
+            --control: #fff;
+            --border: #cfd8e3;
+            --border-strong: #a7b4c4;
+            --radius-panel: 8px;
+            --radius-card: 8px;
+            --radius-control: 6px;
+            --shadow-panel: 0 10px 24px rgba(20, 35, 60, 0.08);
+            --shadow-card: 0 6px 14px rgba(20, 35, 60, 0.08);
+            --line-width: 1px;
+            --font-body: 'Source Sans Pro', sans-serif;
+            --font-display: 'Playfair Display', serif;
+        }
+
+        body.demo-illustration {
+            --app-bg: radial-gradient(circle at 18% 14%, rgba(255, 224, 170, 0.42) 0 9%, transparent 27%),
+                      radial-gradient(circle at 86% 18%, rgba(168, 230, 255, 0.32) 0 9%, transparent 25%),
+                      linear-gradient(135deg, #fff8ea 0%, #e3f5ff 100%);
+            --text: #27242c;
+            --muted: #625d6a;
+            --accent: #ff6b6b;
+            --accent-soft: rgba(255, 107, 107, 0.18);
+            --on-accent: #fff;
+            --panel: #fffef8;
+            --panel-strong: #fff;
+            --control: #fffdf4;
+            --border: rgba(61, 55, 78, 0.72);
+            --border-strong: rgba(61, 55, 78, 0.82);
+            --radius-panel: 18px;
+            --radius-card: 16px;
+            --radius-control: 12px;
+            --shadow-panel: 3px 3px 0 rgba(61, 55, 78, 0.42);
+            --shadow-card: 2px 2px 0 rgba(61, 55, 78, 0.36);
+            --line-width: 2px;
+            --font-body: 'Nunito', sans-serif;
+            --font-display: 'Nunito', sans-serif;
+        }
+
+        body.demo-light-modern {
+            --app-bg: radial-gradient(circle at 92% 10%, rgba(255, 206, 167, 0.18) 0 10%, transparent 24%),
+                      radial-gradient(circle at 12% 82%, rgba(112, 170, 255, 0.22) 0 14%, transparent 32%),
+                      linear-gradient(145deg, #fff9f1 0%, #edf5ff 100%);
+            --text: #303345;
+            --muted: #6d7082;
+            --accent: #6d7dfc;
+            --accent-soft: rgba(109, 125, 252, 0.14);
+            --on-accent: #fff;
+            --panel: rgba(255, 255, 255, 0.78);
+            --panel-strong: #fff;
+            --control: rgba(255, 255, 255, 0.88);
+            --border: rgba(82, 93, 143, 0.16);
+            --border-strong: rgba(109, 125, 252, 0.45);
+            --radius-panel: 20px;
+            --radius-card: 18px;
+            --radius-control: 12px;
+            --shadow-panel: 0 18px 38px rgba(91, 105, 160, 0.14);
+            --shadow-card: 0 10px 22px rgba(91, 105, 160, 0.12);
+            --line-width: 2px;
+            --font-body: 'Quicksand', sans-serif;
+            --font-display: 'Quicksand', sans-serif;
+        }
+
+        body.demo-classic {
+            --app-bg: linear-gradient(180deg, #f6f8fb 0%, #e7edf4 100%);
+            --text: #263442;
+            --muted: #627183;
+            --accent: #4f7fb9;
+            --accent-soft: rgba(79, 127, 185, 0.13);
+            --on-accent: #fff;
+            --panel: #f8fbff;
+            --panel-strong: #fff;
+            --control: #fff;
+            --border: #c8d3df;
+            --border-strong: #8aa2bc;
+            --radius-panel: 8px;
+            --radius-card: 6px;
+            --radius-control: 4px;
+            --shadow-panel: inset 0 1px 0 #fff, 0 10px 20px rgba(34, 52, 74, 0.12);
+            --shadow-card: inset 0 1px 0 #fff, 0 5px 12px rgba(34, 52, 74, 0.1);
+            --line-width: 1px;
+            --font-body: 'Source Sans Pro', sans-serif;
+            --font-display: 'Source Sans Pro', sans-serif;
+        }
+
+        body.demo-glass-refined {
+            --app-bg: linear-gradient(145deg, #f9e7e9 0%, #e0d9f5 100%);
+            --text: #2f2b3b;
+            --muted: rgba(47, 43, 59, 0.72);
+            --accent: #ff9f8f;
+            --accent-soft: rgba(255, 159, 143, 0.22);
+            --on-accent: #4a3f5e;
+            --panel: rgba(255, 255, 255, 0.34);
+            --panel-strong: rgba(255, 255, 255, 0.58);
+            --control: rgba(255, 255, 255, 0.72);
+            --border: rgba(255, 255, 255, 0.48);
+            --border-strong: rgba(255, 159, 143, 0.45);
+            --radius-panel: 24px;
+            --radius-card: 18px;
+            --radius-control: 12px;
+            --shadow-panel: 0 18px 40px rgba(126, 104, 150, 0.18);
+            --shadow-card: 0 10px 24px rgba(126, 104, 150, 0.14);
+            --line-width: 1px;
+            --font-body: 'Nunito', sans-serif;
+            --font-display: 'Quicksand', sans-serif;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            padding: 22px 14px;
+            background: var(--panel);
+            border-right: var(--line-width) solid var(--border);
+            box-shadow: var(--shadow-panel);
+            position: sticky;
+            top: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 26px;
+            padding: 0 8px;
+        }
+
+        .brand-mark {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border-radius: var(--radius-control);
+            background: var(--accent);
+            color: var(--on-accent);
+            font-weight: 800;
+        }
+
+        .brand-name {
+            font-family: var(--font-display);
+            color: var(--accent);
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .nav {
+            display: grid;
+            gap: 10px;
+        }
+
+        .nav button,
+        .toolbar button,
+        .style-tabs button,
+        .modal-actions button {
+            border: var(--line-width) solid transparent;
+            border-radius: var(--radius-control);
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .nav button {
+            text-align: left;
+            padding: 12px 14px;
+            font-weight: 700;
+        }
+
+        .nav button.active,
+        .nav button:hover {
+            background: var(--accent-soft);
+            border-color: var(--border-strong);
+        }
+
+        .main {
+            padding: 24px 30px;
+            min-width: 0;
+        }
+
+        .style-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .style-tabs button {
+            padding: 8px 14px;
+            background: var(--panel);
+            border-color: var(--border);
+            box-shadow: var(--shadow-card);
+            font-weight: 700;
+        }
+
+        .style-tabs button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--on-accent);
+        }
+
+        .hero {
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 3vw, 3.2rem);
+            line-height: 1.05;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            color: var(--muted);
+            max-width: 720px;
+            line-height: 1.55;
+        }
+
+        .search-panel,
+        .card,
+        .toolbar,
+        .preview-panel,
+        .modal-sample,
+        .toast-sample {
+            background: var(--panel);
+            border: var(--line-width) solid var(--border);
+            border-radius: var(--radius-panel);
+            box-shadow: var(--shadow-panel);
+        }
+
+        body.demo-glass-refined .sidebar,
+        body.demo-glass-refined .search-panel,
+        body.demo-glass-refined .card,
+        body.demo-glass-refined .toolbar,
+        body.demo-glass-refined .preview-panel,
+        body.demo-glass-refined .modal-sample,
+        body.demo-glass-refined .toast-sample {
+            backdrop-filter: blur(14px);
+        }
+
+        .search-panel {
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .web-search {
+            /* Demo 搜索组合固定为 2px 线宽，避免全局 line-width 影响其他控件边框。 */
+            --search-line-width: 2px;
+            display: flex;
+            width: min(760px, 100%);
+            height: 44px;
+        }
+
+        .web-search select,
+        .web-search input,
+        .web-search button {
+            border: var(--search-line-width) solid var(--accent);
+            height: 44px;
+        }
+
+        .web-search select {
+            width: 150px;
+            border-right: 0;
+            border-radius: var(--radius-control) 0 0 var(--radius-control);
+            background: var(--control);
+            color: var(--text);
+            padding: 0 12px;
+        }
+
+        .web-search input {
+            flex: 1;
+            min-width: 0;
+            border-radius: 0;
+            background: var(--control);
+            color: var(--text);
+            padding: 0 14px;
+            outline: none;
+        }
+
+        .web-search input::placeholder {
+            color: var(--muted);
+        }
+
+        .web-search button {
+            width: 56px;
+            border-left: 0;
+            border-radius: 0 var(--radius-control) var(--radius-control) 0;
+            background: var(--accent);
+            color: var(--on-accent);
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .categories {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 8px 0 16px;
+        }
+
+        .categories button {
+            padding: 7px 13px;
+            border-radius: var(--radius-control);
+            border: var(--line-width) solid var(--border);
+            background: var(--panel-strong);
+            color: inherit;
+            font-weight: 700;
+        }
+
+        .categories button.active {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+        }
+
+        .bookmark-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .card {
+            border-radius: var(--radius-card);
+            padding: 14px;
+            display: grid;
+            grid-template-columns: 38px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-control);
+            display: grid;
+            place-items: center;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .card h3 {
+            font-size: 1rem;
+            line-height: 1.2;
+        }
+
+        .card p {
+            color: var(--muted);
+            font-size: 0.86rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .toolbar {
+            margin-top: 16px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar button {
+            background: var(--panel-strong);
+            border-color: var(--border);
+            padding: 8px 12px;
+            font-weight: 700;
+        }
+
+        .toolbar button.primary {
+            background: var(--accent);
+            color: var(--on-accent);
+            border-color: var(--accent);
+        }
+
+        .right-panel {
+            padding: 24px 18px;
+            display: grid;
+            gap: 16px;
+            align-content: start;
+        }
+
+        .preview-panel,
+        .modal-sample,
+        .toast-sample {
+            padding: 16px;
+        }
+
+        .preview-panel h2,
+        .modal-sample h2 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: var(--line-width) solid var(--border);
+        }
+
+        .setting-row:last-child {
+            border-bottom: 0;
+        }
+
+        .switch {
+            width: 44px;
+            height: 24px;
+            border-radius: 999px;
+            background: var(--accent);
+            border: var(--line-width) solid var(--border);
+            position: relative;
+        }
+
+        /* 开关圆点使用几何居中，避免不同主题线宽导致上下视觉偏移。 */
+        .switch::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 3px;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--on-accent);
+        }
+
+        body.demo-glass-refined .switch {
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        body.demo-glass-refined .switch::after {
+            background: var(--accent);
+        }
+
+        .modal-sample p,
+        .toast-sample {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .modal-actions button {
+            padding: 8px 12px;
+            border-color: var(--border);
+            background: var(--panel-strong);
+        }
+
+        .modal-actions .save {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--on-accent);
+        }
+
+        .toast-sample {
+            border-left: 5px solid var(--accent);
+        }
+
+        .style-note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        body.demo-illustration .illustration {
+            display: grid;
+        }
+
+        .illustration {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .blob {
+            height: 46px;
+            border: 2px solid var(--border);
+            border-radius: 999px;
+            background: var(--accent-soft);
+        }
+
+        @media (max-width: 1100px) {
+            body {
+                grid-template-columns: 190px minmax(0, 1fr);
+            }
+
+            .right-panel {
+                grid-column: 1 / -1;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                padding: 0 24px 24px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                display: block;
+            }
+
+            .sidebar {
+                position: static;
+                min-height: auto;
+            }
+
+            .main,
+            .right-panel {
+                padding: 16px;
+            }
+
+            .right-panel {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .bookmark-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .web-search {
+                height: auto;
+                flex-wrap: wrap;
+            }
+
+            .web-search select,
+            .web-search input,
+            .web-search button {
+                height: 40px;
+            }
+
+            .web-search select {
+                width: 120px;
+            }
+
+            .web-search input {
+                min-width: calc(100% - 176px);
+            }
+        }
+    </style>
+</head>
+<body class="demo-illustration">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">G</div>
+            <div>
+                <div class="brand-name">GeorgeHua</div>
+                <p class="style-note">主题风格展示</p>
+            </div>
+        </div>
+        <nav class="nav">
+            <button class="active">🏠 主页</button>
+            <button>👤 个人介绍</button>
+            <button>📋 版本更新</button>
+            <button>⚙️ 设置</button>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <div class="style-tabs" aria-label="候选风格切换">
+            <button class="active" data-theme="demo-illustration">插画风格</button>
+            <button data-theme="demo-light-modern">浅色现代</button>
+            <button data-theme="demo-classic">经典拟物</button>
+            <button data-theme="demo-glass-refined">玻璃精修</button>
+        </div>
+
+        <section class="hero">
+            <h1>候选主题风格预览</h1>
+            <p>该页面独立展示候选风格，不接入主应用主题系统。重点观察搜索栏、书签卡片、工具栏、设置面板和提示组件在不同风格下是否适合长期使用。</p>
+        </section>
+
+        <section class="search-panel">
+            <form class="web-search" role="search">
+                <select aria-label="选择搜索引擎">
+                    <option>Google</option>
+                    <option>Bing</option>
+                    <option>DuckDuckGo</option>
+                </select>
+                <input type="text" placeholder="输入关键词...">
+                <button type="button" aria-label="搜索">🔍</button>
+            </form>
+        </section>
+
+        <div class="categories">
+            <button class="active">⭐ 常用</button>
+            <button>🧰 工具</button>
+            <button>📚 学习</button>
+            <button>🎨 设计</button>
+        </div>
+
+        <section class="bookmark-grid">
+            <article class="card">
+                <div class="icon">A</div>
+                <div>
+                    <h3>Ant Design</h3>
+                    <p>ant.design/components</p>
+                </div>
+            </article>
+            <article class="card">
+                <div class="icon">G</div>
+                <div>
+                    <h3>GitHub</h3>
+                    <p>github.com/GeorgeHuaR</p>
+                </div>
+            </article>
+            <article class="card">
+                <div class="icon">M</div>
+                <div>
+                    <h3>MDN Web Docs</h3>
+                    <p>developer.mozilla.org</p>
+                </div>
+            </article>
+            <article class="card">
+                <div class="icon">F</div>
+                <div>
+                    <h3>Figma</h3>
+                    <p>figma.com/files</p>
+                </div>
+            </article>
+            <article class="card">
+                <div class="icon">N</div>
+                <div>
+                    <h3>Notion</h3>
+                    <p>notion.so/workspace</p>
+                </div>
+            </article>
+            <article class="card">
+                <div class="icon">C</div>
+                <div>
+                    <h3>Carbon Design</h3>
+                    <p>carbondesignsystem.com</p>
+                </div>
+            </article>
+        </section>
+
+        <section class="toolbar">
+            <div class="toolbar-group">
+                <button class="primary">➕ 添加</button>
+                <button>✏️ 编辑</button>
+                <button>📂 分类</button>
+            </div>
+            <div class="toolbar-group">
+                <button>📤 导出</button>
+                <button>🔄 重置</button>
+            </div>
+        </section>
+    </main>
+
+    <aside class="right-panel">
+        <section class="preview-panel">
+            <h2>设置卡片</h2>
+            <div class="setting-row">
+                <span>显示图标</span>
+                <span class="switch"></span>
+            </div>
+            <div class="setting-row">
+                <span>自动加载</span>
+                <strong>开启</strong>
+            </div>
+            <div class="setting-row">
+                <span>图标源</span>
+                <strong>IconHorse</strong>
+            </div>
+        </section>
+
+        <section class="modal-sample">
+            <h2>弹窗样本</h2>
+            <p>用于观察标题、正文、按钮和边框层级是否与主页风格一致。</p>
+            <div class="modal-actions">
+                <button>取消</button>
+                <button class="save">保存</button>
+            </div>
+        </section>
+
+        <section class="toast-sample">
+            已保存当前书签数据。该区域用于观察 Toast 和提示信息的风格。
+            <div class="illustration">
+                <div class="blob"></div>
+                <div class="blob"></div>
+                <div class="blob"></div>
+            </div>
+        </section>
+    </aside>
+
+    <script>
+        const themeButtons = document.querySelectorAll('.style-tabs button');
+        themeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                themeButtons.forEach(item => item.classList.remove('active'));
+                button.classList.add('active');
+                document.body.className = button.dataset.theme;
+            });
+        });
+    </script>
+</body>
+</html>

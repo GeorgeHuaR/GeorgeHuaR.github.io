@@ -10,6 +10,23 @@
     - AppInitializer: 应用初始化
 */ 
 
+// 【V6.3.3】主题选项只保留 className 与 label，避免为当前不需要的兼容和图标元数据增加复杂度。
+const THEME_OPTIONS = [
+    { className: 'theme-glass', label: '玻璃风格' },
+    { className: 'theme-illustration', label: '插画风格' },
+    { className: 'theme-light-modern', label: '浅色现代' },
+    { className: 'theme-dark-modern', label: '深色现代' },
+    { className: 'theme-tech', label: '科技风格' }
+];
+// 【V6.3.3】风格主题白名单由主题选项清单生成，主题切换只替换这些 class。
+const THEME_CLASSES = THEME_OPTIONS.map(theme => theme.className);
+const DEFAULT_THEME = 'theme-glass';
+
+function getStoredTheme() {
+    const storedTheme = localStorage.getItem('navTheme');
+    return THEME_CLASSES.includes(storedTheme) ? storedTheme : DEFAULT_THEME;
+}
+
 // ==================== 1. AppState - 应用状态管理 ====================
 //#region AppState 模块
 const AppState = {
@@ -17,7 +34,7 @@ const AppState = {
     isEditMode: false,
     selectedIds: new Set(),
     currentFilterCategory: 'cat_1',
-    currentTheme: localStorage.getItem('navTheme') || 'theme-glass',
+    currentTheme: getStoredTheme(),
     currentSearchQuery: '',
 
     // ==================== 图标相关状态 ====================
@@ -201,12 +218,10 @@ const AppState = {
 // ==================== 2. Utils - 工具函数 ====================
 //#region Utils 模块
 const Utils = {
-    // 根据主题类名获取中文名称
+    // 【V6.3.3】根据主题选项清单获取中文名称，避免设置页和工具函数维护两套主题文案。
     getThemeName(themeClass) {
-        if (themeClass === 'theme-modern') return '现代编辑';
-        if (themeClass === 'theme-glass') return '柔和玻璃';
-        if (themeClass === 'theme-tech') return '科技';
-        return '未知';
+        const theme = THEME_OPTIONS.find(item => item.className === themeClass);
+        return theme ? theme.label : '未知';
     },
     
     // 比较两个数据是否相等
@@ -664,7 +679,7 @@ const AppInitializer = {
 
     // 初始化应用
     init() {
-        document.body.className = AppState.currentTheme;
+        this.applyThemeClass(AppState.currentTheme);
         Storage.loadInitialData();
         
         // 检测是否为移动设备并初始化响应式布局
@@ -929,11 +944,18 @@ const AppInitializer = {
     },
 
     
+    // 【V6.3.1】只替换主题 class，保留 body 上未来可能存在的其他状态类。
+    applyThemeClass(themeClass) {
+        document.body.classList.remove(...THEME_CLASSES);
+        document.body.classList.add(themeClass);
+    },
+
     // 设置主题
     setTheme(themeClass) {
-        document.body.className = themeClass;
-        localStorage.setItem('navTheme', themeClass);
-        AppState.setTheme(themeClass);
+        const nextTheme = THEME_CLASSES.includes(themeClass) ? themeClass : DEFAULT_THEME;
+        this.applyThemeClass(nextTheme);
+        localStorage.setItem('navTheme', nextTheme);
+        AppState.setTheme(nextTheme);
     },
     
     // 刷新当前页面
@@ -944,7 +966,8 @@ const AppInitializer = {
 // ==================== 8. 全局导出与初始化 ====================
 //#region 全局导出与初始化
 // 导出核心模块到 CoreModules 命名空间
-window.CoreModules = { AppState, Utils, Storage, DataOperations, ModalManager, ToastManager, AppInitializer };
+// 【V6.3.3】导出主题选项清单，设置页直接复用 className/label 生成主题按钮。
+window.CoreModules = { AppState, Utils, Storage, DataOperations, ModalManager, ToastManager, AppInitializer, THEME_OPTIONS };
 // 同时导出到全局变量，保持向后兼容
 window.AppState = AppState;
 window.Utils = Utils;
