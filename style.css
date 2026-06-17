@@ -1,17 +1,18 @@
 /* ========== STYLE.CSS - 个人导航站全局样式 ========== */
 /* 模块索引：
- * 1. Base：全局重置、基础布局、主题变量默认值
+ * 1. Base：全局重置、基础布局、主题变量兜底值
  * 2. Layout：左侧导航栏、右侧主内容区
  * 3. Page - Home：书签主页、搜索、分类、网格、工具栏
- * 4. Theme Controls：主题切换按钮
- * 5. Themes：主题变量与少量主题特效覆盖
- * 6. Components：弹窗、Toast、分类管理弹窗
- * 7. Page - Settings：设置页与图标控制面板
- * 8. Embedded Pages：iframe 页面容器
- * 9. Responsive：移动端响应式适配
+ * 4. Theme Controls：设置页中的主题切换控件
+ * 5. Components：弹窗、Toast、分类管理弹窗
+ * 6. Page - Settings：设置页与图标控制面板
+ * 7. Embedded Pages：iframe 页面容器
+ * 8. Responsive：移动端响应式适配
+ *
+ * V6.4.2：主题配方与主题专属覆盖已拆分到 themes.css；本文件只保留结构、组件与兜底 token。
  */
 
-/* ========== 1. Base：全局重置、基础布局、主题变量默认值 ========== */
+/* ========== 1. Base：全局重置、基础布局、主题变量兜底值 ========== */
 
 /* #region 全局重置与基础布局 */
 /* 通配选择器：清除所有元素默认内外边距，并设置盒模型为 border-box（宽高包含内边距和边框） */
@@ -26,43 +27,44 @@ body {
     min-height: 100vh;          /* 至少占满视口高度 */
     display: flex;               /* 启用 flex 布局 */
     /* 【V6.3.1】主题系统改为“语义配色 token + 风格 token”，组件不再按控件声明主题变量。 */
-    /* 【V6.3.3】基础默认值与默认玻璃风格保持一致，实际主题仍由 body class 覆盖。 */
-    --app-background: linear-gradient(145deg, #f9e7e9 0%, #e0d9f5 100%);
-    --color-text: #2f2b3b;
-    --color-text-muted: rgba(47, 43, 59, 0.72);
-    --color-accent: #ff9f8f;
-    --color-accent-soft: rgba(255, 159, 143, 0.22);
-    --color-on-accent: #4a3f5e;
-    --color-on-overlay: #2f2b3b;
+    /* 【V6.4.6】插画主题作为公共 token 的基准值；其他主题只覆盖差异，不再通过插画主题重复声明一整套公共变量。 */
+    --app-background: radial-gradient(circle at 18% 14%, rgba(255, 224, 170, 0.1) 0 9%, transparent 27%),
+                      radial-gradient(circle at 86% 18%, rgba(168, 230, 255, 0.32) 0 9%, transparent 25%),
+                      linear-gradient(135deg, #fff8ea 0%, #e3f5ff 100%);
+    --color-text: #27242c;
+    --color-text-muted: #625d6a;
+    --color-accent: #ff6b6b;
+    --color-accent-soft: rgba(255, 107, 107, 0.18);
+    --color-on-accent: #fff;
+    --color-on-overlay: #27242c;
     --color-info: #4f8ff7;
     --color-success: #10b981;
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
     --color-on-status: #fff;
-    --surface-1: rgba(255, 255, 255, 0.34);
-    --surface-2: rgba(255, 255, 255, 0.58);
-    --surface-3: rgba(255, 255, 255, 0.34);
-    --surface-control: rgba(255, 255, 255, 0.72);
-    --surface-overlay: rgba(255, 255, 255, 0.92);
-    --surface-input: rgba(255, 255, 255, 0.72);
+    /* V6.4.6：删除数字 surface token，主题表面只按用途命名。 */
+    --surface-shell: #fffef8;
+    --surface-panel: #fffef8;
+    --surface-card: #fffef8;
+    --surface-control: #fffdf4;
+    --surface-overlay: #fff;
+    --surface-input: #fffdf4;
     /* 【V6.3.6】全局 border token 只表达线宽与颜色，完整 border 写法由组件或主题局部变量决定。 */
-    --border-color-subtle: rgba(255, 255, 255, 0.48);
-    --border-color-strong: rgba(255, 159, 143, 0.45);
-    --border-width: 1px;
+    --border-color-subtle: rgba(61, 55, 78, 0.24);
+    --border-color-strong: rgba(61, 55, 78, 0.5);
+    --border-width: 2px;
     --native-control-scheme: light;
     --font-body: 'Nunito', sans-serif;
-    --font-display: 'Quicksand', sans-serif;
-    --radius-panel: 24px;
-    --radius-card: 18px;
+    --font-display: 'Nunito', sans-serif;
+    --radius-panel: 18px;
+    --radius-card: 16px;
     --radius-control: 12px;
-    --radius-pill: 24px;
-    --panel-emphasis-border-left: 6px solid var(--color-accent);
-    --item-emphasis-border-left: 1px solid rgba(255, 255, 255, 0.35);
-    --shadow-panel: 0 18px 40px rgba(126, 104, 150, 0.18);
-    --shadow-card: 0 10px 24px rgba(126, 104, 150, 0.14);
-    --shadow-control: 0 4px 8px rgba(126, 104, 150, 0.14);
-    --blur-surface: blur(10px);
-    --blur-strong: blur(14px);
+    --radius-pill: 18px;
+    --shadow-panel: 3px 3px 0 rgba(61, 55, 78, 0.4);
+    --shadow-card: 2px 2px 0 rgba(61, 55, 78, 0.3);
+    --shadow-control: 2px 2px 0 rgba(61, 55, 78, 0.3);
+    --blur-surface: none;
+    --blur-strong: none;
     --effect-glow: none;
     --effect-text-glow: none;
     background: var(--app-background);
@@ -106,7 +108,7 @@ select option:checked {
     flex-direction: column;       /* 垂直排列子元素 */
     justify-content: space-between; /* 上下两端分散对齐 */
     padding: 18px 12px;
-    background: var(--surface-3); /* 【V6.3.1】读取语义 surface，风格差异由主题 token 控制。 */
+    background: var(--surface-shell); /* V6.4.6：侧栏读取应用壳层 surface，和 panel/card/control 语义分离。 */
     backdrop-filter: var(--blur-surface);   /* 背景模糊，毛玻璃效果 */
     border-right: var(--border-width) solid var(--border-color-strong);
     text-align: center;
@@ -282,10 +284,11 @@ select option:checked {
     padding: 24px;
     border-radius: var(--radius-panel);
     margin-bottom: 22px;
-    background: var(--surface-1);
+    background: var(--surface-panel);
     backdrop-filter: var(--blur-surface);
     border: var(--border-width) solid var(--border-color-subtle);
-    border-left: var(--panel-emphasis-border-left);
+    /* V6.4.5：左侧强调边属于 content-card 组件结构，不再通过完整 border token 注入。 */
+    border-left: 6px solid var(--color-accent);
     box-shadow: var(--shadow-panel);
 }
 .content-card h2 {
@@ -333,7 +336,7 @@ select option:checked {
     }
 
     .search-engine-select:hover {
-        background: var(--surface-2);
+        background: var(--surface-control);
     }
 
     .search-engine-select:focus-visible,
@@ -352,7 +355,7 @@ select option:checked {
         padding: 0 16px;
         border: var(--search-border-width) solid var(--color-accent);
         border-radius: 0;
-        background: var(--surface-control);
+        background: transparent;
         color: var(--color-text);
         font-size: 1.05rem;
         outline: none;
@@ -406,13 +409,14 @@ select option:checked {
     white-space: nowrap;
 }
 /* 分类按钮 */
-.category-filter button {
+/* V6.4.3：主页分类筛选按钮使用显式 category-btn 类，避免后续容器内新增按钮时继承筛选按钮样式。 */
+.category-filter .category-btn {
     padding: 8px 20px;
     border: var(--border-width) solid transparent;
     border-radius: var(--radius-control);
     font-size: 1rem;
     cursor: pointer;
-    background: var(--surface-2);
+    background: var(--surface-control);
     color: inherit;
     transition: 0.15s;
     display: inline-flex;
@@ -420,17 +424,17 @@ select option:checked {
     gap: 6px;
 }
 /* 激活的分类按钮 */
-.category-filter button.active {
+.category-filter .category-btn.active {
     border-color: var(--color-accent);
     font-weight: 600;
     background: var(--color-accent-soft);
 }
-.category-filter button:hover {
+.category-filter .category-btn:hover {
     background: var(--color-accent-soft);
     border-color: var(--color-accent);
 }
 /* 编辑模式下分类筛选按钮禁用样式 */
-.category-filter button:disabled {
+.category-filter .category-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -450,10 +454,11 @@ select option:checked {
     align-items: center;              /* flex 子项垂直居中 */
     gap: 12px;
     padding: 12px 10px;
-    background: var(--surface-1);
+    background: var(--surface-card);
     border-radius: var(--radius-card);
     border: var(--border-width) solid var(--border-color-subtle);
-    border-left: var(--item-emphasis-border-left);
+    /* V6.4.5：书签卡默认只保留轻结构边，特殊主题需要强调边时在 themes.css 覆盖。 */
+    border-left: var(--border-width) solid var(--border-color-subtle);
     backdrop-filter: var(--blur-surface);
     transition: transform 0.15s, box-shadow 0.15s; /* 悬停动画 */
     cursor: default;
@@ -505,7 +510,7 @@ select option:checked {
     width: 32px;
     height: 32px;
     border-radius: var(--radius-control);
-    background: var(--surface-2);
+    background: var(--surface-control);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -553,7 +558,7 @@ select option:checked {
     padding: 0 10px;
     display: inline-flex;
     align-items: center;
-    background: var(--surface-2);
+    background: var(--surface-control);
     border-radius: var(--radius-pill);
 }
 
@@ -626,7 +631,7 @@ select option:checked {
 /* 底部固定工具栏 */
 .toolbar-container {
     /* 【V6.3.6】工具栏作为独立容器使用完整外框，不再保留仅绘制顶部线条的遗留样式。 */
-    background: var(--surface-1);
+    background: var(--surface-panel);
     backdrop-filter: var(--blur-surface);
     border: var(--border-width) solid var(--border-color-subtle);
     padding: 12px 24px;
@@ -661,7 +666,7 @@ select option:checked {
     font-size: 0.9rem;
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-    background: var(--surface-2);
+    background: var(--surface-control);
     color: inherit;
     display: inline-flex;
     align-items: center;
@@ -677,7 +682,7 @@ select option:checked {
 }
 
 /* 分类筛选按钮悬停效果 */
-.category-filter button:hover {
+.category-filter .category-btn:hover {
     background: var(--color-accent-soft);
     border-color: var(--color-accent);
     transform: translateY(1px);
@@ -692,7 +697,7 @@ select option:checked {
 
 .bookmarks-content::-webkit-scrollbar-track,
 .main-content::-webkit-scrollbar-track {
-    background: var(--surface-2);
+    background: var(--surface-control);
     border-radius: 4px;
 }
 
@@ -712,13 +717,13 @@ select option:checked {
 .bookmarks-content,
 .main-content {
     scrollbar-width: thin;
-    scrollbar-color: var(--color-accent-soft) var(--surface-2);
+    scrollbar-color: var(--color-accent-soft) var(--surface-control);
 }
 /*#endregion*/ /* 3.4 书签首页布局 */
 
 /*#endregion*/ /* 3. Page - Home */
 
-/* ========== 4. Theme Controls：主题切换按钮 ========== */
+/* ========== 4. Theme Controls：设置页中的主题切换控件 ========== */
 /*#region 主题设置按钮组*/
 /* 主题选项容器 */
 .theme-options {
@@ -729,7 +734,7 @@ select option:checked {
 }
 /* 主题按钮 */
 .theme-btn {
-    /* 【V6.3.3】5 个主题按钮统一为紧凑定宽样式，避免设置区块拥挤。 */
+    /* V6.4.4：主题按钮保留紧凑定宽，但移除旧版缩放反馈，避免设置页选项按钮 hover 时产生跳动。 */
     min-width: 104px;
     height: 38px;
     padding: 0 14px;
@@ -739,11 +744,10 @@ select option:checked {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    background: var(--surface-2);
+    background: var(--surface-control);
     color: inherit;
 }
 .theme-btn:hover {
-    transform: scale(1.02);
     background: var(--color-accent-soft);
 }
 .theme-btn.active {
@@ -752,271 +756,7 @@ select option:checked {
 }
 /*#endregion*/
 
-/* ========== 5. Themes：主题变量与少量主题特效覆盖 ========== */
-/* #region 主题样式 */
-/* 【V6.3.3】主题区只定义 5 个风格主题的语义 token：当前“主题”同时包含风格与配色。 */
-.theme-glass {
-    --app-background: linear-gradient(145deg, #f9e7e9 0%, #e0d9f5 100%);
-    --color-text: #2f2b3b;
-    --color-text-muted: rgba(47, 43, 59, 0.72);
-    --color-accent: #ff9f8f;
-    --color-accent-soft: rgba(255, 159, 143, 0.22);
-    --color-on-accent: #4a3f5e;
-    --color-on-overlay: #2f2b3b;
-    --surface-1: rgba(255, 255, 255, 0.34);
-    --surface-2: rgba(255, 255, 255, 0.58);
-    --surface-3: rgba(255, 255, 255, 0.34);
-    --surface-control: rgba(255, 255, 255, 0.72);
-    --surface-overlay: rgba(255, 255, 255, 0.92);
-    --surface-input: rgba(255, 255, 255, 0.72);
-    --border-color-subtle: rgba(255, 255, 255, 0.48);
-    --border-color-strong: rgba(255, 159, 143, 0.45);
-    --border-width: 1px;
-    --native-control-scheme: light;
-    --font-body: 'Nunito', sans-serif;
-    --font-display: 'Quicksand', sans-serif;
-    --radius-panel: 24px;
-    --radius-card: 18px;
-    --radius-control: 12px;
-    --radius-pill: 24px;
-    --panel-emphasis-border-left: 6px solid var(--color-accent);
-    --item-emphasis-border-left: 1px solid rgba(255, 255, 255, 0.35);
-    --shadow-panel: 0 18px 40px rgba(126, 104, 150, 0.18);
-    --shadow-card: 0 10px 24px rgba(126, 104, 150, 0.14);
-    --shadow-control: 0 4px 8px rgba(126, 104, 150, 0.14);
-    --blur-surface: blur(10px);
-    --blur-strong: blur(14px);
-    --effect-glow: none;
-    --effect-text-glow: none;
-}
-/* ------------------------------------插画主题------------------------------------------------ */
-.theme-illustration {
-    /* 【V6.3.6】插画局部变量：完整 border 只用于插画专属覆盖，避免全局 border color 语义嵌套。 */
-    --illustration-border-soft: 2px solid rgba(61, 55, 78, 0.24);
-    --illustration-border-medium: 2px solid rgba(61, 55, 78, 0.5);
-    --illustration-border-strong: 2px solid rgba(61, 55, 78, 0.82);
-    --illustration-shadow-sm: 1px 1px 0 rgba(61, 55, 78, 0.25);
-    --illustration-shadow-md: 2px 2px 0 rgba(61, 55, 78, 0.3);
-    --illustration-shadow-lg: 3px 3px 0 rgba(61, 55, 78, 0.4);
 
-    --app-background: radial-gradient(circle at 18% 14%, rgba(255, 224, 170, 0.1) 0 9%, transparent 27%),
-                      radial-gradient(circle at 86% 18%, rgba(168, 230, 255, 0.32) 0 9%, transparent 25%),
-                      linear-gradient(135deg, #fff8ea 0%, #e3f5ff 100%);
-    --color-text: #27242c;
-    --color-text-muted: #625d6a;
-    --color-accent: #ff6b6b;
-    --color-accent-soft: rgba(255, 107, 107, 0.18);
-    --color-on-accent: #fff;
-    --color-on-overlay: #27242c;
-    --surface-1: #fffef8;
-    --surface-2: #fff;
-    --surface-3: #fffef8;
-    --surface-control: #fffdf4;
-    --surface-overlay: #fff;
-    --surface-input: #fffdf4;
-    --border-color-subtle: rgba(61, 55, 78, 0.24);
-    --border-color-strong: rgba(61, 55, 78, 0.5);
-    --border-width: 2px;
-    --native-control-scheme: light;
-    --font-body: 'Nunito', sans-serif;
-    --font-display: 'Nunito', sans-serif;
-    --radius-panel: 18px;
-    --radius-card: 16px;
-    --radius-control: 12px;
-    --radius-pill: 18px;
-    --panel-emphasis-border-left: 6px solid var(--color-accent);
-    --item-emphasis-border-left: 2px solid rgba(61, 55, 78, 0.24);
-    /* 插画阴影 token 复用局部贴纸阴影，供 content-card、工具栏、卡片 hover 等通用组件读取。 */
-    --shadow-panel: var(--illustration-shadow-lg);
-    --shadow-card: var(--illustration-shadow-md);
-    --shadow-control: var(--illustration-shadow-md);
-    --blur-surface: none;
-    --blur-strong: none;
-    --effect-glow: none;
-    --effect-text-glow: none;
-}
-
-/* 插画风格 - 导航栏 */
-/* 【V6.3.6】插画主题补充局部完整 border 与贴纸阴影，让导航、工具栏和书签卡片形成统一手绘边界。 */
-.theme-illustration .sidebar {
-    /* 侧栏使用中等墨线和横向投影，模拟插画纸片从页面左侧压出的边界。 */
-    box-shadow: 3px 0 0 rgba(61, 55, 78, 0.24);
-    border-right: var(--illustration-border-medium);
-}
-
-.theme-illustration .nav-btn {
-    /* background: var(--surface-2); */
-    /* 导航按钮默认态使用轻描边和小阴影，避免只有 hover/active 才出现插画风格。 */
-    border: var(--illustration-border-soft);
-    /* border-left-width: 4px; */
-    /* border-left-color: transparent; */
-    box-shadow: var(--illustration-shadow-sm);
-}
-
-.theme-illustration .nav-btn:hover,
-.theme-illustration .nav-btn.active {
-    background: var(--color-accent-soft);
-    border: var(--illustration-border-medium);
-    border-left: 4px solid var(--color-accent);
-    box-shadow: var(--illustration-shadow-md);
-}
-
-/* 插画风格 - 底部工具栏 */
-.theme-illustration .toolbar-container {
-    /* 底部工具栏面积较大，使用 soft 描边和大号贴纸阴影承接插画主题的块状容器感。 */
-    border: var(--illustration-border-soft);
-    box-shadow: var(--illustration-shadow-lg);
-}
-
-.theme-illustration .bookmark-search-input {
-    /* 工具栏内输入框使用 soft 完整边框，避免复用侧栏或工具栏容器的结构边界。 */
-    /* border: var(--illustration-border-soft); */
-    box-shadow: var(--illustration-shadow-sm);
-}
-
-.theme-illustration .toolbar-btn {
-    background: var(--surface-2);
-    /* 工具栏按钮使用轻描边，避免和工具栏容器的大阴影互相抢层级。 */
-    border: var(--illustration-border-soft);
-    box-shadow: var(--illustration-shadow-sm);
-}
-
-.theme-illustration .toolbar-btn:hover {
-    border: var(--illustration-border-medium);
-    box-shadow: var(--illustration-shadow-md);
-}
-
-/* 插画风格 - 书签卡片 */
-.theme-illustration .bookmark-card {
-    /* 【V6.3.7】书签卡片默认使用中等贴纸阴影，hover 再增强，避免上浮时阴影反而减弱。 */
-    box-shadow: var(--illustration-shadow-md);
-    border: var(--illustration-border-soft);
-    border-left: var(--item-emphasis-border-left);
-}
-
-.theme-illustration .bookmark-card:hover {
-    box-shadow: var(--illustration-shadow-lg);
-}
-
-/* -------------------------------- 浅色现代 ---------------------------------- */
-.theme-light-modern {
-    --app-background: radial-gradient(circle at 92% 10%, rgba(255, 206, 167, 0.18) 0 10%, transparent 24%),
-                      radial-gradient(circle at 12% 82%, rgba(112, 170, 255, 0.22) 0 14%, transparent 32%),
-                      linear-gradient(145deg, #fff9f1 0%, #edf5ff 100%);
-    --color-text: #303345;
-    --color-text-muted: #6d7082;
-    --color-accent: #6d7dfc;
-    --color-accent-soft: rgba(109, 125, 252, 0.14);
-    --color-on-accent: #fff;
-    --color-on-overlay: #303345;
-    --surface-1: rgba(255, 255, 255, 0.78);
-    --surface-2: #fff;
-    --surface-3: rgba(255, 255, 255, 0.76);
-    --surface-control: rgba(255, 255, 255, 0.88);
-    --surface-overlay: #fff;
-    --surface-input: rgba(255, 255, 255, 0.88);
-    --border-color-subtle: rgba(82, 93, 143, 0.16);
-    --border-color-strong: rgba(109, 125, 252, 0.45);
-    --border-width: 1px;
-    --native-control-scheme: light;
-    --font-body: 'Quicksand', sans-serif;
-    --font-display: 'Quicksand', sans-serif;
-    --radius-panel: 20px;
-    --radius-card: 18px;
-    --radius-control: 12px;
-    --radius-pill: 18px;
-    --panel-emphasis-border-left: 6px solid var(--color-accent);
-    --item-emphasis-border-left: 1px solid rgba(82, 93, 143, 0.16);
-    --shadow-panel: 0 18px 38px rgba(91, 105, 160, 0.14);
-    --shadow-card: 0 10px 22px rgba(91, 105, 160, 0.12);
-    --shadow-control: 0 5px 12px rgba(91, 105, 160, 0.12);
-    --blur-surface: blur(4px);
-    --blur-strong: blur(8px);
-    --effect-glow: none;
-    --effect-text-glow: none;
-}
-
-.theme-dark-modern {
-    --app-background: #0b1a2f;
-    --color-text: #e8eef2;
-    --color-text-muted: rgba(232, 238, 242, 0.72);
-    --color-accent: #f3b33d;
-    --color-accent-soft: rgba(243, 179, 61, 0.2);
-    --color-on-accent: #0b1a2f;
-    --color-on-overlay: #e8eef2;
-    --surface-1: rgba(255, 255, 255, 0.05);
-    --surface-2: rgba(255, 255, 255, 0.05);
-    --surface-3: rgba(10, 25, 40, 0.95);
-    --surface-control: rgba(0, 0, 0, 0.3);
-    --surface-overlay: #13233a;
-    --surface-input: rgba(0, 0, 0, 0.3);
-    --border-color-subtle: rgba(255, 255, 255, 0.1);
-    --border-color-strong: rgba(243, 179, 61, 0.3);
-    --border-width: 1px;
-    --native-control-scheme: dark;
-    --font-body: 'Source Sans Pro', sans-serif;
-    --font-display: 'Playfair Display', serif;
-    --radius-panel: 32px;
-    --radius-card: 16px;
-    --radius-control: 12px;
-    --radius-pill: 24px;
-    --panel-emphasis-border-left: 6px solid var(--color-accent);
-    --item-emphasis-border-left: 4px solid var(--color-accent);
-    /* 【V6.3.4】深色现代使用低强度黑色阴影，避免沿用浅色玻璃的粉紫阴影质感。 */
-    --shadow-panel: 0 14px 30px rgba(0, 0, 0, 0.22);
-    --shadow-card: 0 8px 18px rgba(0, 0, 0, 0.18);
-    --shadow-control: 0 4px 10px rgba(0, 0, 0, 0.16);
-    --blur-surface: blur(4px);
-    --blur-strong: blur(8px);
-    --effect-glow: none;
-    --effect-text-glow: none;
-}
-
-.theme-tech {
-    --app-background: #0c0e14;
-    --color-text: #c0e0ff;
-    --color-text-muted: rgba(192, 224, 255, 0.72);
-    --color-accent: #0ff;
-    --color-accent-soft: rgba(0, 255, 255, 0.2);
-    --color-on-accent: #0a0e14;
-    --color-on-overlay: #c0e0ff;
-    --surface-1: rgba(0, 20, 20, 0.6);
-    --surface-2: rgba(0, 40, 40, 0.4);
-    --surface-3: rgba(0, 20, 20, 0.95);
-    --surface-control: rgba(0, 30, 30, 0.8);
-    --surface-overlay: #0c0e14;
-    --surface-input: #1a1e2a;
-    --border-color-subtle: #0ff;
-    --border-color-strong: #0ff;
-    --border-width: 1px;
-    --native-control-scheme: dark;
-    --font-body: 'Space Mono', monospace;
-    --font-display: 'Audiowide', cursive;
-    --radius-panel: 12px;
-    --radius-card: 10px;
-    --radius-control: 8px;
-    --radius-pill: 8px;
-    --panel-emphasis-border-left: 1px solid var(--color-accent);
-    --item-emphasis-border-left: 1px solid var(--color-accent);
-    --shadow-panel: 0 0 18px rgba(0, 255, 255, 0.08);
-    --shadow-card: 0 0 14px rgba(0, 255, 255, 0.12);
-    --shadow-control: 0 0 10px rgba(0, 255, 255, 0.1);
-    --blur-surface: blur(4px);
-    --blur-strong: blur(8px);
-    --effect-glow: 0 0 15px cyan;
-    --effect-text-glow: 0 0 10px cyan;
-    background-image: 
-        linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-}
-
-/* 【V6.3.3】科技主题保留网格和发光等风格特效，其余组件外观由语义 token 驱动。 */
-.theme-tech .bookmarks-content::-webkit-scrollbar-thumb:hover {
-    box-shadow: var(--effect-glow);
-}
-
-/*#endregion*/
 
 /* ========== 6. Components：弹窗、Toast、分类管理弹窗 ========== */
 /* ---------- 6.1 弹窗样式 ---------- */
@@ -1075,7 +815,7 @@ select option:checked {
     font-weight: 500;
 }
 .modal-btn.cancel {
-    background: var(--surface-2);
+    background: var(--surface-control);
     color: inherit;
 }
 .modal-btn.save {
@@ -1177,7 +917,7 @@ select option:checked {
         gap: 8px;
     }
     .category-item .cat-actions button {
-        background: var(--surface-2);
+        background: var(--surface-control);
         border: none;
         cursor: pointer;
         font-size: 1.2rem;
@@ -1234,7 +974,7 @@ select option:checked {
     position: relative;
     width: 50px;
     height: 26px;
-    background: var(--surface-2);
+    background: var(--surface-control);
     border-radius: 13px;
     transition: background 0.3s ease;
     flex-shrink: 0;
@@ -1306,19 +1046,24 @@ select option:checked {
 }
 
 .icon-btn {
+    /* V6.4.4：图标控制按钮统一为中性工具按钮，清空缓存不再使用 danger 特殊配色。 */
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 10px 18px;
-    border: none;
+    border: var(--border-width) solid transparent;
     border-radius: var(--radius-control);
     font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    background: var(--surface-control);
+    color: inherit;
 }
 
 .icon-btn:hover:not(:disabled) {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
     transform: translateY(-1px);
 }
 
@@ -1329,36 +1074,6 @@ select option:checked {
 
 .icon-btn .btn-icon {
     font-size: 1.1rem;
-}
-
-.icon-btn.primary {
-    background: var(--color-accent);
-    color: var(--color-on-accent);
-}
-
-.icon-btn.primary:hover:not(:disabled) {
-    background: var(--color-accent);
-    opacity: 0.88;
-}
-
-.icon-btn.secondary {
-    background: var(--surface-2);
-    color: inherit;
-    border: var(--border-width) solid var(--border-color-subtle);
-}
-
-.icon-btn.secondary:hover:not(:disabled) {
-    background: var(--color-accent-soft);
-}
-
-.icon-btn.danger {
-    background: var(--color-danger);
-    color: var(--color-on-status);
-}
-
-.icon-btn.danger:hover:not(:disabled) {
-    background: var(--color-danger);
-    opacity: 0.88;
 }
 
 /* 更新模式选择 */
@@ -1397,7 +1112,7 @@ select option:checked {
     margin: 20px 0;
     padding: 15px;
     border-radius: var(--radius-card);
-    background: var(--surface-2);
+    background: var(--surface-card);
     flex-wrap: wrap;
 }
 
@@ -1429,7 +1144,7 @@ select option:checked {
 .icon-log-panel {
     margin-top: 20px;
     border-radius: var(--radius-card);
-    background: var(--surface-2);
+    background: var(--surface-card);
     overflow: hidden;
 }
 
@@ -1438,7 +1153,7 @@ select option:checked {
     justify-content: space-between;
     align-items: center;
     padding: 10px 15px;
-    background: var(--surface-2);
+    background: var(--surface-card);
     border-bottom: var(--border-width) solid var(--border-color-subtle);
 }
 
@@ -1451,7 +1166,7 @@ select option:checked {
     padding: 4px 12px;
     border: none;
     border-radius: var(--radius-control);
-    background: var(--surface-2);
+    background: var(--surface-control);
     color: inherit;
     font-size: 0.85rem;
     cursor: pointer;
@@ -1616,7 +1331,7 @@ select option:checked {
         margin-bottom: 15px;
     }
     
-    .category-filter button {
+    .category-filter .category-btn {
         padding: 6px 12px;
         font-size: 0.9rem;
     }
@@ -1754,7 +1469,7 @@ select option:checked {
         margin-bottom: 10px;
     }
     
-    .category-filter button {
+    .category-filter .category-btn {
         padding: 4px 8px;
         font-size: 0.8rem;
     }

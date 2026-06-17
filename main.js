@@ -20,7 +20,7 @@ const THEME_OPTIONS = [
 ];
 // 【V6.3.3】风格主题白名单由主题选项清单生成，主题切换只替换这些 class。
 const THEME_CLASSES = THEME_OPTIONS.map(theme => theme.className);
-const DEFAULT_THEME = 'theme-glass';
+const DEFAULT_THEME = 'theme-illustration';
 
 function getStoredTheme() {
     const storedTheme = localStorage.getItem('navTheme');

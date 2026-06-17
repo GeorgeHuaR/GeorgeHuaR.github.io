@@ -333,8 +333,9 @@ const HomePage = (function() {
         const isEditMode = window.CoreModules.AppState.isEditMode;
         
         // 直接使用数据中的分类（已包含 "全部" 和 "未分类"）
+        // V6.4.3：为主页分类筛选按钮补充 category-btn 语义类，避免 CSS 继续依赖 .category-filter button 泛选择器。
         container.innerHTML = currentData.categories.map(cat => 
-            `<button data-category="${cat.id}" class="${cat.id === window.CoreModules.AppState.currentFilterCategory ? 'active' : ''}" ${isEditMode ? 'disabled' : ''}>${cat.icon} ${cat.name}</button>`
+            `<button data-category="${cat.id}" class="category-btn${cat.id === window.CoreModules.AppState.currentFilterCategory ? ' active' : ''}" ${isEditMode ? 'disabled' : ''}>${cat.icon} ${cat.name}</button>`
         ).join('');
     }
 
@@ -452,7 +453,8 @@ const HomePage = (function() {
     function bindCategoryFilterEvents() {
         if (window.CoreModules.AppState.isEditMode) return;
         
-        const filterButtons = document.querySelectorAll('.category-filter button');
+        // V6.4.3：事件绑定跟随 category-btn 语义类，避免分类筛选逻辑误绑定容器内未来新增的其他按钮。
+        const filterButtons = document.querySelectorAll('.category-filter .category-btn');
         filterButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 filterButtons.forEach(b => b.classList.remove('active'));

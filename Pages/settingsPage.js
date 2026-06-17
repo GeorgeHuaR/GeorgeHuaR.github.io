@@ -88,15 +88,16 @@ const SettingsPage = (function() {
                 
                 <!-- 控制按钮组 -->
                 <div class="icon-control-buttons">
-                    <button class="icon-btn primary" id="loadIconsBtn">
+                    <!-- V6.4.4：图标控制按钮统一使用 icon-btn 中性样式，避免加载/清缓存动作携带历史强调色语义。 -->
+                    <button class="icon-btn" id="loadIconsBtn">
                         <span class="btn-icon">🔄</span>
                         <span>加载图标</span>
                     </button>
-                    <button class="icon-btn secondary" id="stopLoadBtn" disabled>
+                    <button class="icon-btn" id="stopLoadBtn" disabled>
                         <span class="btn-icon">⏹️</span>
                         <span>停止</span>
                     </button>
-                    <button class="icon-btn danger" id="clearCacheBtn">
+                    <button class="icon-btn" id="clearCacheBtn">
                         <span class="btn-icon">🗑️</span>
                         <span>清空缓存</span>
                     </button>

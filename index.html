@@ -10,8 +10,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+Pro:wght@400;600&family=Quicksand:wght@400;600;700&family=Nunito:wght@300;400;600&family=Audiowide&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
  
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="themes.css">
+
+    
 </head>
-<body class="theme-glass">
+<body class="theme-illustration">
+    <!-- V6.4.1：在首屏主体内容解析前同步恢复保存主题，避免先渲染默认玻璃主题再切换造成闪烁。 -->
+    <script>
+        (() => {
+            // V6.4.1：早期启动脚本只处理 body class，正式主题状态仍由 main.js 在应用初始化阶段维护。
+            const themeClasses = ['theme-glass', 'theme-illustration', 'theme-light-modern', 'theme-dark-modern', 'theme-tech'];
+
+            try {
+                const storedTheme = localStorage.getItem('navTheme');
+
+                // V6.4.1：仅允许白名单主题覆盖默认 class，避免异常 localStorage 值污染页面根样式。
+                if (themeClasses.includes(storedTheme)) {
+                    document.body.classList.remove(...themeClasses);
+                    document.body.classList.add(storedTheme);
+                }
+            } catch (error) {
+                // V6.4.1：localStorage 不可用时保留 HTML 默认主题，避免早期主题脚本阻断首屏渲染。
+            }
+        })();
+    </script>
     <!-- 左侧导航栏 -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
