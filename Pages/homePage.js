@@ -262,6 +262,13 @@ const HomePage = (function() {
                         <button class="toolbar-btn" id="editAttrBtn" disabled>✏️ 编辑属性</button>
                         <button class="toolbar-btn" id="batchCategoryBtn" disabled>📂 修改分类</button>
                         <button class="toolbar-btn" id="deleteBtn" disabled>🗑️ 删除</button>
+                    </div>
+                    <!-- V6.4：排序按钮独立分组，与删除/完成保持间距避免误触 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="moveUpBtn" disabled>🔼 排序</button>
+                        <button class="toolbar-btn" id="moveDownBtn" disabled>🔽 排序</button>
+                    </div>
+                    <div class="toolbar-group">
                         <button class="toolbar-btn" id="exitEditBtn">✅ 完成</button>
                     </div>
                 </div>
@@ -432,12 +439,32 @@ const HomePage = (function() {
         const editAttrBtn = document.getElementById('editAttrBtn');
         const batchCategoryBtn = document.getElementById('batchCategoryBtn');
         const deleteBtn = document.getElementById('deleteBtn');
+        const moveUpBtn = document.getElementById('moveUpBtn');
+        const moveDownBtn = document.getElementById('moveDownBtn');
 
         if (!editAttrBtn || !batchCategoryBtn || !deleteBtn) return;
 
         editAttrBtn.disabled = count !== 1;
         batchCategoryBtn.disabled = count === 0;
         deleteBtn.disabled = count === 0;
+
+        // V6.4：排序按钮仅在选中恰好 1 项且无搜索查询时启用
+        const hasSearch = window.CoreModules.AppState.currentSearchQuery.trim().length > 0;
+        const canSort = count === 1 && !hasSearch;
+        moveUpBtn.disabled = true;
+        moveDownBtn.disabled = true;
+
+        if (canSort) {
+            const selectedId = Array.from(window.CoreModules.AppState.selectedIds)[0];
+            const data = window.CoreModules.Storage.getAppData();
+            // 收集同分类书签，按数组顺序排列
+            const bookmark = data.bookmarks.find(b => b.id === selectedId);
+            if (!bookmark) return;
+            const sameCat = data.bookmarks.filter(b => b.category === bookmark.category);
+            const catIdx = sameCat.findIndex(b => b.id === selectedId);
+            moveUpBtn.disabled = catIdx <= 0;
+            moveDownBtn.disabled = catIdx < 0 || catIdx >= sameCat.length - 1;
+        }
     }
 
     // 更新选中数量显示
@@ -523,6 +550,27 @@ const HomePage = (function() {
                 if (window.CoreModules.AppState.selectedIds.size > 0) {
                     const selectedBookmarks = currentData.bookmarks.filter(b => window.CoreModules.AppState.selectedIds.has(b.id));
                     window.CoreModules.ModalManager.confirmDelete(selectedBookmarks);
+                }
+            });
+
+            // V6.4：上移/下移排序按钮点击事件（同分类内交换位置后重绘）
+            document.getElementById('moveUpBtn').addEventListener('click', () => {
+                if (window.CoreModules.AppState.selectedIds.size === 1) {
+                    const id = Array.from(window.CoreModules.AppState.selectedIds)[0];
+                    window.CoreModules.DataOperations.moveUp(id);
+                    currentData = window.CoreModules.Storage.getAppData();
+                    renderBookmarkGrid();
+                    updateActionButtons();
+                }
+            });
+
+            document.getElementById('moveDownBtn').addEventListener('click', () => {
+                if (window.CoreModules.AppState.selectedIds.size === 1) {
+                    const id = Array.from(window.CoreModules.AppState.selectedIds)[0];
+                    window.CoreModules.DataOperations.moveDown(id);
+                    currentData = window.CoreModules.Storage.getAppData();
+                    renderBookmarkGrid();
+                    updateActionButtons();
                 }
             });
 

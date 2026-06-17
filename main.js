@@ -479,6 +479,46 @@ const DataOperations = {
         return data.bookmarks;
     },
     
+    // V6.4：在数组内将指定书签与其同分类中前一个书签交换位置（上移）
+    moveUp(id) {
+        const data = Storage.getAppData();
+        const idx = data.bookmarks.findIndex(b => b.id == id);
+        if (idx <= 0) return null;
+
+        const currentCat = data.bookmarks[idx].category;
+        // 从 idx-1 开始往前找第一个同分类的书签
+        let targetIdx = idx - 1;
+        while (targetIdx >= 0 && data.bookmarks[targetIdx].category !== currentCat) {
+            targetIdx--;
+        }
+        if (targetIdx < 0) return null; // 已是同分类首条
+
+        // 交换数组位置以持久化排序
+        [data.bookmarks[idx], data.bookmarks[targetIdx]] = [data.bookmarks[targetIdx], data.bookmarks[idx]];
+        Storage.saveAppData(data, { markModified: true });
+        return data.bookmarks;
+    },
+
+    // V6.4：在数组内将指定书签与其同分类中后一个书签交换位置（下移）
+    moveDown(id) {
+        const data = Storage.getAppData();
+        const idx = data.bookmarks.findIndex(b => b.id == id);
+        if (idx < 0 || idx >= data.bookmarks.length - 1) return null;
+
+        const currentCat = data.bookmarks[idx].category;
+        // 从 idx+1 开始往后找第一个同分类的书签
+        let targetIdx = idx + 1;
+        while (targetIdx < data.bookmarks.length && data.bookmarks[targetIdx].category !== currentCat) {
+            targetIdx++;
+        }
+        if (targetIdx >= data.bookmarks.length) return null; // 已是同分类末条
+
+        // 交换数组位置以持久化排序
+        [data.bookmarks[idx], data.bookmarks[targetIdx]] = [data.bookmarks[targetIdx], data.bookmarks[idx]];
+        Storage.saveAppData(data, { markModified: true });
+        return data.bookmarks;
+    },
+
     // 根据分类筛选书签
     filterBookmarksByCategory(bookmarks, category) {
         if (category === 'all') {

@@ -327,7 +327,7 @@ select option:checked {
         border: var(--search-border-width) solid var(--color-accent);
         border-right: none;
         border-radius: var(--radius-control) 0 0 var(--radius-control);
-        background: var(--surface-control);
+        background: transparent;
         color: var(--color-text);
         font-size: 0.95rem;
         cursor: pointer;

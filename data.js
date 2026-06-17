@@ -1,6 +1,6 @@
-// 导出自定义书签数据 (版本 2026-06-15_21-10-19)
+// 导出自定义书签数据 (版本 2026-06-17_22-27-18)
 window.bookmarkData = {
-  VERSION: '2026-06-15_21-10-19',
+  VERSION: '2026-06-17_22-27-18',
   searchEngines: [
     {"name":"Bing","url":"https://cn.bing.com/search?q="},
     {"name":"Baidu","url":"https://www.baidu.com/s?wd="},
@@ -41,8 +41,8 @@ window.bookmarkData = {
     {"id":16,"name":"学信档案","url":"https://my.chsi.com.cn/archive/bab/index.action","description":"","category":"cat_3"},
     {"id":17,"name":"立创商城","url":"https://www.szlcsc.com/","description":"","category":"cat_1"},
     {"id":18,"name":"半导小芯","url":"http://www.semiee.com/","description":"","category":"cat_1"},
-    {"id":19,"name":"淘宝","url":"https://www.taobao.com/","description":"","category":"cat_1"},
     {"id":20,"name":"京东","url":"https://www.jd.com/","description":"","category":"cat_1"},
+    {"id":19,"name":"淘宝","url":"https://www.taobao.com/","description":"","category":"cat_1"},
     {"id":21,"name":"中国知网 - 检索","url":"https://www.cnki.net/","description":"","category":"cat_5"},
     {"id":22,"name":"谷歌学术","url":"https://scholar.google.com.hk/schhp?hl=zh-CN&as_sdt=0,5","description":"","category":"cat_5"},
     {"id":23,"name":"CNKI 学术翻译","url":"https://dict.cnki.net/index#","description":"","category":"cat_5"},
@@ -67,5 +67,6 @@ window.bookmarkData = {
     {"id":44,"name":"王雷的网站","url":"https://wangli-pvy6.onrender.com/","description":"","category":"cat-empty"},
     {"id":47,"name":"WinForm开发 net48","url":"https://learn.microsoft.com/zh-cn/dotnet/desktop/winforms/overview/?view=netframeworkdesktop-4.8","description":"","category":"cat_6"},
     {"id":48,"name":"2FA","url":"https://2fa.vip/","description":"","category":"cat_8"},
+    {"id":50,"name":"Ant Design UI","url":"https://ant.design/index-cn?locale=zh-CN","description":"","category":"cat_6"}
   ]
 };
