@@ -1,0 +1,474 @@
+/* ========== ABOUTPAGE.CSS - About 页专属样式（V7.1.2） ========== */
+/* 使用范围：
+ * - 仅服务 Pages/aboutPage.js 渲染出的“个人介绍 / 项目展示”页面。
+ * - 本文件只消费 style.css 与 themes.css 提供的主题 token，不定义新主题变量。
+ * - 提前在 index.html head 中加载，避免首屏渲染后补样式造成闪烁。
+ *
+ * 命名约定：所有 class 以 about- 为前缀，与全局样式零冲突。
+ */
+
+/* ========== 1. Page Shell：页面外壳与导语 ========== */
+/* 项目卡片纵向排列，保证新增/删除项目时布局策略不变 */
+.about-section-title {
+    /* 位于导语卡片与项目卡片之间的分隔标题 */
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    margin-top: 4px;
+    color: var(--color-text);
+}
+
+/* ========== 2. Project Cards：项目卡片 ========== */
+/* 统一复用 content-card 的语义 token，保持所有主题下视觉一致 */
+.about-project-card {
+    margin-bottom: 28px;
+    padding: 24px;
+    border-radius: var(--radius-panel);
+    background: var(--surface-panel);
+    backdrop-filter: var(--blur-surface);
+    border: var(--border-width) solid var(--border-color-subtle);
+    border-left: 6px solid var(--color-accent);
+    box-shadow: var(--shadow-panel);
+    overflow: hidden;
+}
+
+/* ---------- 2.1 文字区域（标题 + 标签 + 描述） ---------- */
+/* 位于图片上方，保证用户在滚动时先看到项目概要再看到截图 */
+.about-project-copy {
+    margin-bottom: 18px;
+}
+.about-project-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--color-text);
+    line-height: 1.3;
+}
+
+/* 技术栈标签用 accent-soft 底色，轻量元信息而不是操作按钮 */
+.about-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.about-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent-soft);
+    color: var(--color-text);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+}
+
+/* 项目说明保持低强调，不和标题抢层级 */
+.about-project-description {
+    font-size: 0.92rem;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+    margin-bottom: 0;
+}
+.about-project-description + .about-project-description {
+    margin-top: 6px;
+}
+
+/* ---------- 2.2 走马灯区域 ---------- */
+/* 包裹走马灯 + caption + 缩略图条，作为一个完整图片模块 */
+/* .about-media-area { */
+    /* 空容器，子元素控制全部布局 */
+/* } */
+
+/* 走马灯本体：固定高度保证切换时不跳动 */
+.about-media-frame {
+    position: relative;
+    width: 100%;
+    height: 460px;
+    overflow: hidden;
+    border-radius: calc(var(--radius-control) * 0.5);
+    background: var(--surface-control);
+}
+
+/* 轨道：flex 横向排列所有幻灯片 */
+.about-carousel-track {
+    display: flex;
+    height: 100%;
+    will-change: transform;
+}
+
+/* 单张幻灯片：占满轨道宽度 */
+.about-carousel-slide {
+    flex: 0 0 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* 图片基类：宽高填满窗口，cursor 提示可点击看原图 */
+.about-carousel-slide img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.25s ease;
+}
+.about-carousel-slide img:hover {
+    opacity: 0.92;
+    transform: scale(1.015);
+}
+
+/* image-fit 双模式由 per-project imageFit 字段控制 */
+.about-project-card.about-media-frame--contain .about-carousel-slide img {
+    /* contain：完整显示原图，避免截图被裁切丢失内容 */
+    object-fit: contain;
+    background-color: var(--surface-control);
+}
+.about-project-card.about-media-frame--cover .about-carousel-slide img {
+    /* cover：裁剪填充，适合照片、封面图或氛围图 */
+    object-fit: cover;
+}
+
+/* 图片加载失败时显示占位文字，不影响布局 */
+.about-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    background: var(--surface-control);
+}
+
+/* ---------- 2.3 切换箭头 ---------- */
+/* 半透明圆形底，hover 时加深 */
+.about-carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.30);
+    color: #fff;
+    font-size: 1.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    padding: 0;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    user-select: none;
+    -webkit-user-select: none;
+    line-height: 1;
+}
+.about-carousel-btn:hover {
+    background: rgba(0, 0, 0, 0.55);
+    transform: translateY(-50%) scale(1.08);
+}
+.about-carousel-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+.about-carousel-btn--prev { left: 12px; }
+.about-carousel-btn--next { right: 12px; }
+
+/* ---------- 2.4 底部圆点 ---------- */
+/* 用于快速感知图片数量，适合图片少且不展示缩略图的场景 */
+.about-carousel-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+}
+.about-carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.about-carousel-dot.active {
+    background: var(--color-accent);
+    transform: scale(1.35);
+}
+.about-carousel-dot:hover {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- 2.5 图片说明 + 计数器 ---------- */
+/* 位于走马灯与缩略图条之间，不覆盖图片 */
+.about-media-caption {
+    padding: 10px 4px 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+.about-media-caption .about-caption-text {
+    flex: 1;
+    font-weight: 500;
+    color: var(--color-text);
+}
+.about-media-caption .about-caption-sep {
+    opacity: 0.4;
+}
+.about-media-caption .about-media-counter {
+    flex-shrink: 0;
+    opacity: 0.6;
+    font-size: 0.82rem;
+}
+
+/* ---------- 2.6 缩略图条 ---------- */
+/* 可选展示，由 projects[].showThumbnails 控制 */
+.about-thumbnail-strip {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0 2px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+.about-thumbnail-strip::-webkit-scrollbar { height: 4px; }
+.about-thumbnail-strip::-webkit-scrollbar-thumb {
+    background: var(--border-color-subtle);
+    border-radius: 2px;
+}
+
+/* 单个缩略图：固定尺寸 + 蒙版覆盖非当前图 */
+.about-thumbnail {
+    flex: 0 0 auto;
+    width: 80px;
+    height: 56px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.25s ease;
+}
+.about-thumbnail.active {
+    border-color: var(--color-accent);
+}
+.about-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 蒙版：非当前图半透明覆盖，active 时清除 */
+.about-thumbnail::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    transition: background 0.25s ease;
+    border-radius: inherit;
+}
+.about-thumbnail.active::after {
+    background: transparent;
+}
+.about-thumbnail:hover::after {
+    background: rgba(0, 0, 0, 0.20);
+}
+
+/* ========== 3. Lightbox：原图预览 ========== */
+/* 外层容器：grid 居中，全屏覆盖 */
+.about-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+}
+
+/* hidden 属性与 CSS display:none 同步，避免属性冲突 */
+.about-lightbox[hidden] {
+    display: none !important;
+}
+
+/* 遮罩层：覆盖全屏，点击关闭（由 data-about-close 处理） */
+.about-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* 弹窗卡片：固定深灰色背景，尺寸约束 */
+.about-lightbox-panel {
+    position: relative;
+    z-index: 1;
+    width: min(1100px, 94vw);
+    max-height: 90vh;
+    /* background: rgba(25, 25, 30, 0.93); */
+    background: rgba(252, 252, 255, 0.951);
+    border-radius: 12px;
+    padding: 14px;
+}
+
+/* 图片容器：flex column，position:relative 提供按钮 absolute 锚点 */
+.about-lightbox-figure {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    position: relative;
+}
+
+/* 关闭按钮：absolute 定位于图片右上角 */
+.about-lightbox-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.30);
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 10;
+    line-height: 1;
+    transition: background 0.2s;
+}
+.about-lightbox-close:hover {
+    background: rgba(0, 0, 0, 0.50);
+}
+/* 备选：白底半透 rgba(255,255,255,0.10) — 在深色面板上对比度更柔和，浅色图像区可见性更好 */
+
+/* 导航按钮：absolute 定位于图片左右两侧 */
+.about-lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 40px;
+    height: 56px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.30);
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    line-height: 1;
+    transition: background 0.25s;
+}
+.about-lightbox-nav:hover {
+    background: rgba(0, 0, 0, 0.50);
+}
+.about-lightbox-nav--prev { left: 6px; }
+.about-lightbox-nav--next { right: 6px; }
+
+/* 单张原图：object-fit contain */
+.about-lightbox-image {
+    width: 100%;
+    max-height: 76vh;
+    display: block;
+    object-fit: contain;
+    border-radius: 8px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* figcaption：caption 左 + counter 右 */
+.about-lightbox-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    color: rgba(28, 26, 26, 0.578);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* 计数器 "1/N" */
+.about-lightbox-counter {
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.50);
+    font-weight: 700;
+}
+
+/* ========== 4. Responsive ========== */
+/* 平板 (< 768px) */
+@media screen and (max-width: 768px) {
+    .about-project-card { padding: 18px; }
+    .about-media-frame { height: 340px; }
+    .about-project-title { font-size: 1.1rem; }
+    .about-project-description { font-size: 0.88rem; }
+
+    .about-thumbnail { width: 64px; height: 44px; }
+
+    .about-lightbox-nav { width: 40px; height: 60px; font-size: 1.6rem; }
+    .about-lightbox-image { max-height: 62vh; }
+    .about-lightbox-caption { font-size: 0.88rem; }
+    .about-lightbox-counter { font-size: 0.84rem; }
+}
+
+/* 手机 (< 480px) */
+@media screen and (max-width: 480px) {
+    .about-project-card {
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+    .about-media-frame { height: 260px; }
+    .about-project-copy { margin-bottom: 12px; }
+    .about-project-title {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+    .about-project-description { font-size: 0.84rem; }
+    .about-tag { font-size: 0.72rem; padding: 1px 8px; }
+
+    .about-media-caption {
+        font-size: 0.82rem;
+        padding: 8px 2px 4px;
+    }
+
+    .about-thumbnail { width: 52px; height: 36px; }
+
+    .about-carousel-btn {
+        width: 34px; height: 34px; font-size: 1.2rem;
+    }
+    .about-carousel-btn--prev { left: 6px; }
+    .about-carousel-btn--next { right: 6px; }
+    .about-carousel-dots { gap: 6px; bottom: 10px; }
+    .about-carousel-dot { width: 8px; height: 8px; }
+
+    .about-lightbox { padding: 12px; }
+    .about-lightbox-panel { gap: 6px; }
+    .about-lightbox-nav { width: 36px; height: 50px; font-size: 1.4rem; }
+    .about-lightbox-figure {
+        padding: 10px; border-radius: 0;
+    }
+    .about-lightbox-image { max-height: 55vh; border-radius: 4px; }
+    .about-lightbox-close {
+        top: 6px; right: 6px; width: 34px; height: 34px; font-size: 1.1rem;
+    }
+    .about-lightbox-caption { font-size: 0.84rem; margin-top: 8px; }
+    .about-lightbox-counter { font-size: 0.8rem; }
+}

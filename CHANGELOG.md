@@ -1,5 +1,8 @@
 
 > V6.X 版本是用CODEX优化后的版本，主要是主题系统优化（新增CSS变量，新增主题等）
+> V7.X 是Opencode-V4 Flash继续开发的版本
+
+
 ## V6.1.1 数据加载与同步逻辑优化
 【书签源】
     data.js为默认数据源，存放初始书签，用户可手动编辑；localStorage 是运行时存储，用户可以通过界面编辑书签，操作后数据保存在localStorage
@@ -30,3 +33,55 @@
     3. 与现有编辑模式完美融合：复用 updateActionButtons() 的 disable 逻辑，新增按钮直接放入已有 btn 组
     4. CSS Grid 兼容：按钮操作不依赖卡片在网格中的视觉位置
 
+
+---
+# 个人主页开发
+
+## V6.6.1 DS-AboutPage初版发布
+实现了基本功能，但很多细节需要优化；
+与CODEX的方案对比后，执行V7.1优化
+
+【核心方案 V6.6.1】
+- 图片裁剪：建议作为项目的可配置字段 imageFit, 可选 contain/cover
+- 缩略图+蒙版：主走马图下方增加一条缩略图导航条，当前图高亮，其他图用半透明蒙版覆盖。
+- 数据结构
+```
+var projects = [
+    {
+        id: 'proj-1',
+        title: '项目名称',
+        description: '项目总体说明文字',
+        techTags: ['Vue', 'TypeScript', 'Vite'],
+        /* 样式覆盖字段（可选，不填则使用 STYLE_CONFIG 全局默认） */
+        showThumbnails: true,         // 是否启用缩略图条
+        autoPlay: false,              // 本项目是否自动轮播
+        imageFit: 'contain',          // 'contain' | 'cover'
+        images: [
+            { src: '...', caption: '主页设计稿及交互流程' },
+            { src: '...', caption: '移动端适配方案' },
+            { src: '...', caption: '暗色主题效果' }
+        ]
+    }
+];
+```
+
+## V7.1.1 About页 CSS+JS架构优化
+- 独立CSS + `about-*` 命名空间
+- 安全HTML转义+防御性编程
+- 拆分render
+- 单委托事件模型+- Map 存储状态，cleanup更方便
+- Lightbox 静态HTML+hidden属性切换
+- 动态效果
+
+## V7.1.2 description多段 + Lightbox交互优化
+- description 从 String 改为 Array<string>，遍历输出多段 `<p>`
+- Lightbox 重构为 flex 双层布局（body→prev/figure/next，caption 独立一行）
+- 背景滚动锁定（open/close Lightbox 切换 body.overflow）
+- 滚轮切换图片 + 300ms 防抖
+- 手机端 overflow:auto 原生双指缩放
+- 移除计数器，dots 保留在 figure 底部
+
+
+
+
+---

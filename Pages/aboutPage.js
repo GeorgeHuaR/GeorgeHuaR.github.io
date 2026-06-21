@@ -1,20 +1,15 @@
 /** ---------------------------------------------------
- * @brief:		个人介绍页面模块 - 项目作品集展示
- * @file:		aboutPage.js
- * @author:		GeorgeHua
- * @date:		2026/06/18
- * @version:	V6.6.1
- * @details:	文字在上+图片在下布局；每图 caption + 计数器；缩略图条（蒙版覆盖）；per-project imageFit/autoPlay
+ * @brief:      个人介绍页面模块 - 项目作品集展示（V7.1.3）
+ * @file:       aboutPage.js
+ * @author:     GeorgeHua
+ * @date:       2026/06/21
+ * @version:    V7.1.3
+ * @details:    Lightbox 单图 src 交换 + 固定深色卡片；按钮 absolute 叠入
+ *              figure（prev/next/close）；滚轮切换+300ms防抖；背景锁定
  *----------------------------------------------------*/
 
 const AboutPage = (function () {
     /* ==================== 1. 全局配置 ==================== */
-    /** ---------------------------------------------------
-     * 全局默认配置，按项目可覆盖（通过 projects[].xxx 字段）
-     * autoPlay:          全局默认是否自动轮播
-     * autoPlayInterval:  自动播放间隔（毫秒）
-     * transitionDuration: 切换动画时长（毫秒）
-     *----------------------------------------------------*/
     var STYLE_CONFIG = {
         autoPlay: false,
         autoPlayInterval: 6000,
@@ -22,20 +17,15 @@ const AboutPage = (function () {
     };
 
     /* ==================== 2. 项目数据 ==================== */
-    /** ---------------------------------------------------
-     * @brief 项目列表 — 后续用户直接修改此数组
-     * @note  techTags:      技术栈标签数组
-     *        showThumbnails: 是否显示缩略图条
-     *        autoPlay:      本项目是否自动轮播（不填则继承全局）
-     *        imageFit:      'contain' | 'cover' 图片适配方式
-     *        images[].src:   图片路径（相对网站根目录）
-     *        images[].caption: 本张图片的轻量说明文字
-     *----------------------------------------------------*/
     var projects = [
         {
             id: 'demo-1',
             title: '示例项目一：个人导航站',
-            description: '基于纯前端 SPA 架构的个人导航站，支持多主题切换、书签管理、分类筛选与搜索引擎集成。',
+            description: [
+                '基于纯前端 SPA 架构的个人导航站，支持多主题切换、书签管理。',
+                '书签支持分类筛选、排序和搜索引擎集成。',
+                '数据持久化使用 localStorage，支持导入导出。'
+            ],
             techTags: ['JavaScript', 'CSS3', 'LocalStorage'],
             showThumbnails: true,
             autoPlay: false,
@@ -48,7 +38,10 @@ const AboutPage = (function () {
         {
             id: 'demo-2',
             title: '示例项目二：数据可视化面板',
-            description: '多图走马灯演示项目，展示三张不同场景与交互状态的截图。',
+            description: [
+                '多图走马灯演示项目，展示三张不同场景与交互状态的截图。',
+                '用于测试走马灯组件在 multi-image 场景下的切换、缩略图、自动轮播等功能表现。'
+            ],
             techTags: ['ECharts', 'Vue', 'SCSS'],
             showThumbnails: true,
             autoPlay: true,
@@ -62,7 +55,9 @@ const AboutPage = (function () {
         {
             id: 'demo-3',
             title: '示例项目三：工具集应用',
-            description: '单张图片项目，用于演示走马灯在单图情况下的降级表现。',
+            description: [
+                '单张图片项目，用于演示走马灯在单图情况下的降级表现。'
+            ],
             techTags: ['Python', 'Flask', 'SQLite'],
             showThumbnails: false,
             imageFit: 'contain',
@@ -73,7 +68,10 @@ const AboutPage = (function () {
         {
             id: 'demo-4',
             title: '示例项目四：移动端解决方案',
-            description: '包含多张移动端设计稿与交互原型预览，展示不同页面布局方案。',
+            description: [
+                '包含多张移动端设计稿与交互原型预览，展示不同页面布局方案。',
+                '涵盖首页、个人中心、设置页等核心页面的交互流程。'
+            ],
             techTags: ['React Native', 'TypeScript', 'Styled Components'],
             showThumbnails: true,
             autoPlay: false,
@@ -86,7 +84,10 @@ const AboutPage = (function () {
         {
             id: 'demo-5',
             title: '示例项目五：组件库设计',
-            description: '通用 UI 组件库的设计与实现，涵盖按钮、表单、弹窗等常见交互组件的视觉规范。',
+            description: [
+                '通用 UI 组件库的设计与实现，涵盖按钮、表单、弹窗等常见交互组件的视觉规范。',
+                '使用 Storybook 进行组件展示与文档管理，支持主题变量实时切换预览。'
+            ],
             techTags: ['Storybook', 'React', 'CSS Variables'],
             showThumbnails: true,
             autoPlay: true,
@@ -99,535 +100,522 @@ const AboutPage = (function () {
     ];
 
     /* ==================== 3. 内部状态 ==================== */
-    var carouselInstances = [];
-    var lightboxInstance = null;
-    var contentDelegation = null;
+    var pageRoot = null;
+    var carouselTimers = new Map();       // projectId → timerId
+    var currentSlideByProject = new Map(); // projectId → slideIndex
+    var lightboxState = null;             // { projectId, imageIndex } 或 null
+    var lastWheelTime = 0;               // 滚轮防抖时间戳
+    var WHEEL_DEBOUNCE = 300;            // 滚轮防抖间隔（ms）
+    var wheelHandler = null;             // 滚轮事件监听器引用
+    var clickHandler = null;
+    var mouseenterHandler = null;
+    var mouseleaveHandler = null;
+    var keydownHandler = null;
 
-    /* ==================== 4. 渲染函数 ==================== */
-    /** ---------------------------------------------------
-     * @brief 生成页面完整 HTML
-     * @returns {string}
-     *----------------------------------------------------*/
-    function render() {
-        var cardsHtml = '';
+    /* ==================== 4. 工具函数 ==================== */
+    /** 转义 HTML 特殊字符，避免项目数据中的 < > & " ' 破坏 DOM */
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
 
-        for (var p = 0; p < projects.length; p++) {
-            var proj = projects[p];
-            var total = proj.images.length;
-            var showMultiple = total > 1;
+    /** 属性值转义（行为和 escapeHtml 一致，单独保留函数名便于后续区分 URL 等字段） */
+    function escapeAttribute(value) { return escapeHtml(value); }
 
-            /* 4a. 图片适配类名 */
-            var fitClass = proj.imageFit === 'cover' ? 'image-fit-cover' : 'image-fit-contain';
+    /** CSS.escape 兼容封装，用于 data 属性选择器中的特殊字符 */
+    function cssEscape(value) {
+        if (window.CSS?.escape) return window.CSS.escape(value);
+        return String(value).replaceAll('"', '\\"');
+    }
 
-            /* 4b. 幻灯片帧 HTML */
-            var slidesHtml = '';
-            for (var i = 0; i < total; i++) {
-                var img = proj.images[i];
-                slidesHtml += ''
-                    + '<div class="project-carousel-slide">'
-                    +   '<img src="' + img.src + '" alt="' + proj.title + ' - 图片' + (i + 1) + '" loading="lazy">'
-                    + '</div>';
-            }
+    /** 获取项目图片数组，防御性取值保证返回数组而非 undefined/null */
+    function getProjectImages(project) {
+        return Array.isArray(project?.images) ? project.images : [];
+    }
 
-            /* 4c. 切换控件（多图时渲染） */
-            var arrowsHtml = showMultiple
-                ? '<button class="carousel-arrow carousel-arrow--prev" data-action="prev" aria-label="上一张">‹</button>'
-                + '<button class="carousel-arrow carousel-arrow--next" data-action="next" aria-label="下一张">›</button>'
-                : '';
+    /** 将任意索引归一到 [0, length) 范围内（取模循环）
+     *  负数也能正确翻转：(-1 % 3 + 3) % 3 = 2 */
+    function normalizeIndex(index, length) {
+        if (!length) return 0;
+        return ((index % length) + length) % length;
+    }
 
-            var dotsHtml = '';
-            if (showMultiple) {
-                var dotItems = '';
-                for (var d = 0; d < total; d++) {
-                    dotItems += '<span class="carousel-dot' + (d === 0 ? ' active' : '') + '" data-index="' + d + '"></span>';
-                }
-                dotsHtml = '<div class="carousel-dots">' + dotItems + '</div>';
-            }
-
-            /* 4d. 技术标签 */
-            var tagsHtml = '';
-            if (proj.techTags && proj.techTags.length > 0) {
-                var tagItems = '';
-                for (var t = 0; t < proj.techTags.length; t++) {
-                    tagItems += '<span class="tech-tag">' + proj.techTags[t] + '</span>';
-                }
-                tagsHtml = '<div class="tech-tags">' + tagItems + '</div>';
-            }
-
-            /* 4e. 缩略图条 */
-            var thumbHtml = '';
-            if (proj.showThumbnails && showMultiple) {
-                for (var th = 0; th < total; th++) {
-                    thumbHtml += ''
-                        + '<div class="thumbnail-item' + (th === 0 ? ' active' : '') + '" data-index="' + th + '">'
-                        +   '<img src="' + proj.images[th].src + '" alt="" loading="lazy">'
-                        + '</div>';
-                }
-                thumbHtml = '<div class="thumbnail-strip">' + thumbHtml + '</div>';
-            }
-
-            /* 4f. 首张图片的 caption */
-            var firstCaption = proj.images[0] ? proj.images[0].caption : '';
-
-            cardsHtml += ''
-                + '<div class="project-card ' + fitClass + '" data-project-id="' + proj.id + '">'
-                /* 文字在上 */
-                +   '<div class="project-header">'
-                +     '<h3 class="project-title">' + proj.title + '</h3>'
-                +     tagsHtml
-                +     '<p class="project-desc">' + proj.description + '</p>'
-                +   '</div>'
-                /* 图片区域 */
-                +   '<div class="project-carousel-container">'
-                +     '<div class="project-carousel">'
-                +       '<div class="project-carousel-track">'
-                +         slidesHtml
-                +       '</div>'
-                +       arrowsHtml
-                +       dotsHtml
-                +     '</div>'
-                /* 图片说明 + 计数器 */
-                +     '<div class="project-carousel-caption">'
-                +       '<span class="caption-text">' + firstCaption + '</span>'
-                +       '<span class="caption-sep"> · </span>'
-                +       '<span class="caption-counter">1 / ' + total + '</span>'
-                +     '</div>'
-                /* 缩略图条 */
-                +     thumbHtml
-                +   '</div>'
-                + '</div>';
+    /** 根据 projectId 查找项目配置 */
+    function findProject(projectId) {
+        for (var i = 0; i < projects.length; i++) {
+            if (projects[i].id === projectId) return projects[i];
         }
+        return null;
+    }
 
+    /** 获取图片适配类名 */
+    function getFitClass(project) {
+        return (project.imageFit === 'cover')
+            ? 'about-media-frame--cover'
+            : 'about-media-frame--contain';
+    }
+
+    /** 渲染多段 description 为多个 <p> 标签
+     *  支持数组（多段）和字符串（向后兼容兜底） */
+    function renderDescription(desc) {
+        var arr = Array.isArray(desc) ? desc : (desc ? [desc] : []);
+        return arr.map(function (p) {
+            var text = (p && typeof p === 'string') ? escapeHtml(p) : '';
+            return text ? '<p class="about-project-description">' + text + '</p>' : '';
+        }).join('');
+    }
+
+    /* ==================== 5. 渲染函数 ==================== */
+    function render() {
         return ''
             + '<div class="content-card about-intro">'
             +   '<h2>👤 关于我</h2>'
             +   '<p>GeorgeHua 的个人导航站，这里展示了我参与和开发的一些项目。点击图片可查看原图。</p>'
             + '</div>'
-            + '<h2 class="projects-section-title">🚧 个人项目展示</h2>'
-            + cardsHtml;
+            + '<h2 class="about-section-title">🚧 个人项目展示</h2>'
+            + '<div data-about-page>'
+            +   projects.map(renderProjectCard).join('')
+            +   renderLightbox()
+            + '</div>';
     }
 
-    /* ==================== 5. 走马灯管理器 ==================== */
-    /** ---------------------------------------------------
-     * @brief 创建单个走马灯实例
-     * @param {string}   projectId
-     * @param {object[]} images - { src, caption }[]
-     * @returns {object|null}
-     *----------------------------------------------------*/
-    function createCarousel(projectId, images) {
-        var cardEl = document.querySelector('.project-card[data-project-id="' + projectId + '"]');
-        if (!cardEl) return null;
-
-        var carouselContainer = cardEl.querySelector('.project-carousel');
-        var track = carouselContainer.querySelector('.project-carousel-track');
-        var dots = carouselContainer.querySelectorAll('.carousel-dot');
-
-        /* 获取 caption / counter 元素 */
-        var captionEl = cardEl.querySelector('.project-carousel-caption');
-        var captionText = captionEl ? captionEl.querySelector('.caption-text') : null;
-        var captionCounter = captionEl ? captionEl.querySelector('.caption-counter') : null;
-
-        /* 获取缩略图元素 */
-        var thumbnailItems = cardEl.querySelectorAll('.thumbnail-item');
-
+    function renderProjectCard(project) {
+        var images = getProjectImages(project);
         var total = images.length;
-        var currentIndex = 0;
-        var timer = null;
-        var isAnimating = false;
-        var isPaused = false;
-        var duration = STYLE_CONFIG.transitionDuration || 400;
+        var showMultiple = total > 1;
+        var fitClass = getFitClass(project);
+        var firstImage = images[0] || { src: '', caption: '' };
+        var pid = escapeAttribute(project.id);
 
-        /* 项目级 autoPlay：优先使用项目配置，未设置则继承全局 */
-        var proj = getProjectById(projectId);
-        var autoPlayEnabled = (proj && proj.autoPlay !== undefined) ? proj.autoPlay : STYLE_CONFIG.autoPlay;
-        var autoPlayInterval = STYLE_CONFIG.autoPlayInterval || 6000;
+        /* 预生成幻灯片 HTML */
+        var slidesHtml = '';
+        for (var si = 0; si < images.length; si++) {
+            var img = images[si];
+            var altText = img.alt || project.title + ' - 图片' + (si + 1);
+            slidesHtml += '<div class="about-carousel-slide">'
+                + '<img src="' + escapeAttribute(img.src) + '" alt="' + escapeAttribute(altText) + '" loading="lazy">'
+                + '</div>';
+        }
 
-        /* 切换幻灯片 */
-        function goTo(index) {
-            if (isAnimating) return;
-            if (index < 0) index = total - 1;
-            if (index >= total) index = 0;
-            if (index === currentIndex) return;
+        /* 预生成箭头 HTML */
+        var arrowsHtml = showMultiple
+            ? '<button class="about-carousel-btn about-carousel-btn--prev" data-about-prev="' + pid + '" aria-label="上一张">‹</button>'
+            + '<button class="about-carousel-btn about-carousel-btn--next" data-about-next="' + pid + '" aria-label="下一张">›</button>'
+            : '';
 
-            isAnimating = true;
-            currentIndex = index;
+        /* 预生成圆点 HTML */
+        var dotsHtml = '';
+        if (showMultiple) {
+            var dotItems = '';
+            for (var di = 0; di < total; di++) {
+                dotItems += '<span class="about-carousel-dot' + (di === 0 ? ' active' : '') + '" data-about-slide="' + pid + '" data-about-slide-index="' + di + '"></span>';
+            }
+            dotsHtml = '<div class="about-carousel-dots">' + dotItems + '</div>';
+        }
 
-            /* 滑动轨道 */
+        /* 缩略图条 */
+        var thumbsHtml = (showMultiple && project.showThumbnails) ? renderThumbnails(project) : '';
+
+        return ''
+            + '<div class="about-project-card ' + fitClass + '" data-about-project="' + pid + '">'
+            +   '<div class="about-project-copy">'
+            +     '<h3 class="about-project-title">' + escapeHtml(project.title) + '</h3>'
+            +     renderTags(project.techTags)
+            +     renderDescription(project.description)
+            +   '</div>'
+            +   '<div class="about-media-area">'
+            +     '<div class="about-media-frame">'
+            +       '<div class="about-carousel-track" data-about-track="' + pid + '">'
+            +         slidesHtml
+            +       '</div>'
+            +       arrowsHtml
+            +       dotsHtml
+            +     '</div>'
+            +     '<div class="about-media-caption">'
+            +       '<span class="about-caption-text" data-about-caption="' + pid + '">' + escapeHtml(firstImage.caption || '') + '</span>'
+            +       '<span class="about-caption-sep">·</span>'
+            +       '<span class="about-media-counter" data-about-counter="' + pid + '">1 / ' + total + '</span>'
+            +     '</div>'
+            +     thumbsHtml
+            +   '</div>'
+            + '</div>';
+    }
+
+    function renderTags(tags) {
+        if (!tags || !tags.length) return '';
+        return '<div class="about-tag-list">'
+            + tags.map(function (tag) {
+                return '<span class="about-tag">' + escapeHtml(tag) + '</span>';
+            }).join('')
+            + '</div>';
+    }
+
+    function renderThumbnails(project) {
+        var images = getProjectImages(project);
+        var pid = escapeAttribute(project.id);
+        return '<div class="about-thumbnail-strip">'
+            + images.map(function (img, i) {
+                return '<div class="about-thumbnail' + (i === 0 ? ' active' : '') + '" data-about-thumb="' + pid + '" data-about-slide-index="' + i + '">'
+                    + '<img src="' + escapeAttribute(img.src) + '" alt="" loading="lazy">'
+                    + '</div>';
+            }).join('')
+            + '</div>';
+    }
+
+    function renderLightbox() {
+        return ''
+            + '<div class="about-lightbox" data-about-lightbox hidden>'
+            +   '<div class="about-lightbox-backdrop" data-about-close></div>'
+            +   '<div class="about-lightbox-panel">'
+            +     '<figure class="about-lightbox-figure">'
+            +       '<button class="about-lightbox-close" data-about-close aria-label="关闭">✕</button>'
+            +       '<button class="about-lightbox-nav about-lightbox-nav--prev" data-about-lightbox-prev aria-label="上一张">‹</button>'
+            +       '<img class="about-lightbox-image" data-about-lightbox-image alt="">'
+            +       '<button class="about-lightbox-nav about-lightbox-nav--next" data-about-lightbox-next aria-label="下一张">›</button>'
+            +       '<figcaption class="about-lightbox-caption">'
+            +         '<span data-about-lightbox-caption></span>'
+            +         '<span class="about-lightbox-counter" data-about-lightbox-counter></span>'
+            +       '</figcaption>'
+            +     '</figure>'
+            +   '</div>'
+            + '</div>';
+    }
+
+    /* ==================== 6. 走马灯控制 ==================== */
+    function stepProjectSlide(projectId, direction, userInitiated) {
+        var project = findProject(projectId);
+        if (!project) return;
+        var currentIndex = currentSlideByProject.get(projectId) || 0;
+        setProjectSlide(projectId, currentIndex + direction, userInitiated);
+    }
+
+    function setProjectSlide(projectId, nextIndex, userInitiated) {
+        var project = findProject(projectId);
+        if (!project) return;
+        var images = getProjectImages(project);
+        if (!images.length) return;
+
+        var normalizedIndex = normalizeIndex(nextIndex, images.length);
+        var card = pageRoot.querySelector('[data-about-project="' + cssEscape(projectId) + '"]');
+        if (!card) return;
+
+        currentSlideByProject.set(projectId, normalizedIndex);
+
+        /* 通过 translateX 滑动轨道 */
+        var track = card.querySelector('[data-about-track="' + cssEscape(projectId) + '"]');
+        if (track) {
+            var duration = STYLE_CONFIG.transitionDuration || 400;
+            var offset = -(normalizedIndex * 100);
             track.style.transition = 'transform ' + duration + 'ms ease';
-            track.style.transform = 'translateX(-' + (index * 100) + '%)';
-
-            /* 更新圆点 */
-            for (var d = 0; d < dots.length; d++) {
-                dots[d].classList.toggle('active', d === index);
-            }
-
-            /* 更新图片说明 + 计数器 */
-            var imgData = images[index] || {};
-            if (captionText) captionText.textContent = imgData.caption || '';
-            if (captionCounter) captionCounter.textContent = (index + 1) + ' / ' + total;
-
-            /* 更新缩略图条 active 状态 + 蒙版 */
-            for (var th = 0; th < thumbnailItems.length; th++) {
-                thumbnailItems[th].classList.toggle('active', th === index);
-            }
-
-            setTimeout(function () {
-                isAnimating = false;
-            }, duration);
+            track.style.transform = 'translateX(' + offset + '%)';
         }
 
-        function next() { goTo(currentIndex + 1); }
+        /* 更新圆点 active 状态 */
+        card.querySelectorAll('[data-about-slide="' + cssEscape(projectId) + '"]').forEach(function (dot) {
+            var idx = Number(dot.dataset.aboutSlideIndex);
+            dot.classList.toggle('active', idx === normalizedIndex);
+        });
 
-        function prev() { goTo(currentIndex - 1); }
+        /* 更新 caption + 计数器 */
+        var imgData = images[normalizedIndex] || {};
+        var captionEl = card.querySelector('[data-about-caption="' + cssEscape(projectId) + '"]');
+        var counterEl = card.querySelector('[data-about-counter="' + cssEscape(projectId) + '"]');
+        if (captionEl) captionEl.textContent = imgData.caption || '';
+        if (counterEl) counterEl.textContent = (normalizedIndex + 1) + ' / ' + images.length;
 
-        /* 启动自动播放 */
-        function startAutoPlay() {
-            if (total <= 1 || !autoPlayEnabled) return;
-            stopAutoPlay();
-            timer = setInterval(function () {
-                if (!isPaused) next();
-            }, autoPlayInterval);
+        /* 更新缩略图 active */
+        card.querySelectorAll('[data-about-thumb="' + cssEscape(projectId) + '"]').forEach(function (thumb) {
+            var idx = Number(thumb.dataset.aboutSlideIndex);
+            thumb.classList.toggle('active', idx === normalizedIndex);
+        });
+
+        /* 用户手动切换后重置自动轮播定时器 */
+        if (userInitiated) {
+            startProjectTimer(project);
         }
-
-        /* 停止自动播放 */
-        function stopAutoPlay() {
-            if (timer) {
-                clearInterval(timer);
-                timer = null;
-            }
-        }
-
-        /* 销毁实例 */
-        function destroy() {
-            stopAutoPlay();
-            if (carouselContainer._onMouseEnter) {
-                carouselContainer.removeEventListener('mouseenter', carouselContainer._onMouseEnter);
-                carouselContainer._onMouseEnter = null;
-            }
-            if (carouselContainer._onMouseLeave) {
-                carouselContainer.removeEventListener('mouseleave', carouselContainer._onMouseLeave);
-                carouselContainer._onMouseLeave = null;
-            }
-        }
-
-        /* hover 暂停/恢复 */
-        carouselContainer._onMouseEnter = function () { isPaused = true; };
-        carouselContainer._onMouseLeave = function () { isPaused = false; };
-        carouselContainer.addEventListener('mouseenter', carouselContainer._onMouseEnter);
-        carouselContainer.addEventListener('mouseleave', carouselContainer._onMouseLeave);
-
-        /* 初始定位 */
-        track.style.transform = 'translateX(0px)';
-        startAutoPlay();
-
-        return {
-            destroy: destroy,
-            goTo: goTo,
-            next: next,
-            prev: prev,
-            startAutoPlay: startAutoPlay,
-            stopAutoPlay: stopAutoPlay,
-            getCurrentIndex: function () { return currentIndex; },
-            getId: function () { return projectId; }
-        };
     }
 
-    /** 根据 projectId 查找项目数据 */
-    function getProjectById(pid) {
-        for (var i = 0; i < projects.length; i++) {
-            if (projects[i].id === pid) return projects[i];
-        }
-        return null;
+    /* ==================== 7. 自动轮播 ==================== */
+    function startAutoPlay() {
+        projects.forEach(function (project) { startProjectTimer(project); });
     }
 
-    /* ==================== 6. 全屏弹窗 ==================== */
-    /** ---------------------------------------------------
-     * @brief 打开全屏弹窗查看原图
-     * @param {object[]} images     - { src, caption }[]
-     * @param {number}   startIndex
-     * @note  支持 ESC 关闭，← → 键盘导航
-     *----------------------------------------------------*/
-    function openLightbox(images, startIndex) {
-        if (lightboxInstance) closeLightbox();
+    function startProjectTimer(project) {
+        if (!project || project.autoPlay === false) return;
+        var images = getProjectImages(project);
+        if (images.length <= 1) return;
 
-        startIndex = startIndex || 0;
-        var total = images.length;
-        var currentIndex = startIndex;
-        var isAnimating = false;
+        stopProjectTimer(project.id);
+        var interval = STYLE_CONFIG.autoPlayInterval || 6000;
+        var timerId = window.setInterval(function () {
+            stepProjectSlide(project.id, 1, false);
+        }, interval);
+        carouselTimers.set(project.id, timerId);
+    }
 
-        var overlay = document.createElement('div');
-        overlay.className = 'lightbox-overlay';
+    function stopProjectTimer(projectId) {
+        var timerId = carouselTimers.get(projectId);
+        if (!timerId) return;
+        window.clearInterval(timerId);
+        carouselTimers["delete"](projectId);
+    }
 
-        var closeBtn = document.createElement('button');
-        closeBtn.className = 'lightbox-close';
-        closeBtn.innerHTML = '✕';
-        closeBtn.setAttribute('aria-label', '关闭');
+    /* ==================== 8. Lightbox ==================== */
+    function openLightbox(projectId, imageIndex) {
+        var project = findProject(projectId);
+        if (!project) return;
+        var images = getProjectImages(project);
+        if (!images.length) return;
 
-        var carouselDiv = document.createElement('div');
-        carouselDiv.className = 'lightbox-carousel';
-        var track = document.createElement('div');
-        track.className = 'lightbox-track';
+        var lightbox = pageRoot.querySelector('[data-about-lightbox]');
+        if (!lightbox) return;
 
-        for (var i = 0; i < total; i++) {
-            var slide = document.createElement('div');
-            slide.className = 'lightbox-slide';
-            var img = document.createElement('img');
-            img.src = images[i].src;
-            img.alt = '原图 ' + (i + 1);
-            img.addEventListener('error', function () {
-                this.alt = '加载失败';
-                this.style.objectFit = 'none';
-            });
-            slide.appendChild(img);
-            track.appendChild(slide);
-        }
-        carouselDiv.appendChild(track);
+        var index = normalizeIndex(imageIndex, images.length);
+        lightboxState = { projectId: projectId, imageIndex: index };
 
-        /* 箭头（多图） */
-        var prevBtn, nextBtn;
-        if (total > 1) {
-            prevBtn = document.createElement('button');
-            prevBtn.className = 'lightbox-arrow lightbox-arrow--prev';
-            prevBtn.innerHTML = '‹';
-            prevBtn.setAttribute('aria-label', '上一张');
-            carouselDiv.appendChild(prevBtn);
+        /* 直接更新图片源 + caption + 计数器 */
+        updateLightbox(images, index);
 
-            nextBtn = document.createElement('button');
-            nextBtn.className = 'lightbox-arrow lightbox-arrow--next';
-            nextBtn.innerHTML = '›';
-            nextBtn.setAttribute('aria-label', '下一张');
-            carouselDiv.appendChild(nextBtn);
-        }
+        /* 显示/隐藏箭头（单图时隐藏） */
+        var prevBtn = lightbox.querySelector('[data-about-lightbox-prev]');
+        var nextBtn = lightbox.querySelector('[data-about-lightbox-next]');
+        if (prevBtn) prevBtn.hidden = images.length <= 1;
+        if (nextBtn) nextBtn.hidden = images.length <= 1;
 
-        /* 圆点（多图） */
-        var dotsContainer;
-        if (total > 1) {
-            dotsContainer = document.createElement('div');
-            dotsContainer.className = 'lightbox-dots';
-            for (var j = 0; j < total; j++) {
-                var dot = document.createElement('span');
-                dot.className = 'lightbox-dot' + (j === startIndex ? ' active' : '');
-                dot.dataset.index = j;
-                dotsContainer.appendChild(dot);
-            }
-            carouselDiv.appendChild(dotsContainer);
-        }
+        lightbox.hidden = false;
 
-        /* 计数器 */
-        var counter = document.createElement('div');
-        counter.className = 'lightbox-counter';
-        counter.textContent = (startIndex + 1) + ' / ' + total;
-
-        /* 图片说明（弹窗下方） */
-        var captionEl = document.createElement('div');
-        captionEl.className = 'lightbox-caption';
-        var firstImg = images[startIndex] || {};
-        captionEl.textContent = firstImg.caption || '';
-
-        overlay.appendChild(closeBtn);
-        overlay.appendChild(carouselDiv);
-        overlay.appendChild(counter);
-        overlay.appendChild(captionEl);
-        document.body.appendChild(overlay);
-
+        /* 锁定背景滚动 + 绑定滚轮切换 */
         document.body.style.overflow = 'hidden';
-
-        /* 初始定位（无过渡） */
-        track.style.transition = 'none';
-        track.style.transform = 'translateX(-' + (startIndex * 100) + '%)';
-        requestAnimationFrame(function () {
-            track.style.transition = 'transform 0.4s ease';
-        });
-
-        function goTo(index) {
-            if (isAnimating) return;
-            if (index < 0) index = total - 1;
-            if (index >= total) index = 0;
-            if (index === currentIndex) return;
-
-            isAnimating = true;
-            currentIndex = index;
-            track.style.transform = 'translateX(-' + (index * 100) + '%)';
-
-            if (dotsContainer) {
-                var dots = dotsContainer.querySelectorAll('.lightbox-dot');
-                for (var d2 = 0; d2 < dots.length; d2++) {
-                    dots[d2].classList.toggle('active', d2 === index);
-                }
-            }
-            counter.textContent = (index + 1) + ' / ' + total;
-
-            var imgData2 = images[index] || {};
-            captionEl.textContent = imgData2.caption || '';
-
-            setTimeout(function () { isAnimating = false; }, 400);
+        if (!wheelHandler) {
+            wheelHandler = handleLightboxWheel;
+            lightbox.addEventListener('wheel', wheelHandler, { passive: false });
         }
-
-        function nextSlide() { goTo(currentIndex + 1); }
-
-        function prevSlide() { goTo(currentIndex - 1); }
-
-        function onKeyDown(e) {
-            if (e.key === 'Escape') { close(); }
-            if (e.key === 'ArrowLeft') { prevSlide(); e.preventDefault(); }
-            if (e.key === 'ArrowRight') { nextSlide(); e.preventDefault(); }
-        }
-        document.addEventListener('keydown', onKeyDown);
-
-        function close() {
-            document.body.removeChild(overlay);
-            document.body.style.overflow = '';
-            document.removeEventListener('keydown', onKeyDown);
-            lightboxInstance = null;
-        }
-
-        closeBtn.addEventListener('click', close);
-        overlay.addEventListener('click', function (e) {
-            if (e.target === overlay) close();
-        });
-        if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-        if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-
-        lightboxInstance = { overlay: overlay, close: close };
     }
 
     function closeLightbox() {
-        if (lightboxInstance) {
-            lightboxInstance.close();
-            lightboxInstance = null;
+        /* 恢复背景滚动 */
+        document.body.style.overflow = '';
+        /* 移除滚轮监听 */
+        if (wheelHandler) {
+            var lb = pageRoot?.querySelector('[data-about-lightbox]');
+            if (lb) lb.removeEventListener('wheel', wheelHandler, { passive: false });
+            wheelHandler = null;
         }
+        var lightbox = pageRoot?.querySelector('[data-about-lightbox]');
+        if (lightbox) lightbox.hidden = true;
+        lightboxState = null;
+        lastWheelTime = 0;
     }
 
-    /* ==================== 7. 事件委托 ==================== */
-    function onContentClick(e) {
-        var target = e.target;
-        var card, pid, inst;
+    /** 滚轮切换图片，300ms 防抖 */
+    function handleLightboxWheel(event) {
+        if (!lightboxState) return;
+        var project = findProject(lightboxState.projectId);
+        if (!project) return;
+        var images = getProjectImages(project);
+        if (images.length <= 1) return;
+
+        var now = Date.now();
+        if (now - lastWheelTime < WHEEL_DEBOUNCE) return;
+        lastWheelTime = now;
+
+        if (event.deltaY > 0) {
+            stepLightboxSlide(1);
+        } else if (event.deltaY < 0) {
+            stepLightboxSlide(-1);
+        }
+        event.preventDefault();
+    }
+
+    function stepLightboxSlide(direction) {
+        if (!lightboxState) return;
+        var project = findProject(lightboxState.projectId);
+        if (!project) return;
+        var images = getProjectImages(project);
+        if (!images.length) return;
+
+        lightboxState.imageIndex = normalizeIndex(
+            lightboxState.imageIndex + direction,
+            images.length
+        );
+
+        updateLightbox(images, lightboxState.imageIndex);
+    }
+
+    function updateLightbox(images, index) {
+        var lightbox = pageRoot?.querySelector('[data-about-lightbox]');
+        if (!lightbox) return;
+
+        var imgData = images[index] || {};
+
+        /* 切换单图 src */
+        var imgEl = lightbox.querySelector('[data-about-lightbox-image]');
+        if (imgEl) imgEl.src = imgData.src || '';
+
+        /* 更新 caption */
+        var captionEl = lightbox.querySelector('[data-about-lightbox-caption]');
+        if (captionEl) captionEl.textContent = imgData.caption || '';
+
+        /* 更新计数器 "1/N" */
+        var counterEl = lightbox.querySelector('[data-about-lightbox-counter]');
+        if (counterEl) counterEl.textContent = (index + 1) + ' / ' + images.length;
+    }
+
+    /* ==================== 9. 事件委托 ==================== */
+    function handlePageClick(event) {
+        var target = event.target;
+        if (!(target instanceof Element)) return;
+
+        var pid, action;
 
         /* 走马灯箭头 */
-        if (target.classList.contains('carousel-arrow')) {
-            var action = target.dataset.action;
-            card = target.closest('.project-card');
-            if (!card) return;
-            pid = card.dataset.projectId;
-            inst = findInstance(pid);
-            if (!inst) return;
-            if (action === 'next') inst.next();
-            else if (action === 'prev') inst.prev();
-            return;
-        }
+        var prevBtn = target.closest('[data-about-prev]');
+        var nextBtn = target.closest('[data-about-next]');
+        if (prevBtn) { stepProjectSlide(prevBtn.dataset.aboutPrev, -1, true); return; }
+        if (nextBtn) { stepProjectSlide(nextBtn.dataset.aboutNext, 1, true); return; }
 
-        /* 圆点点击 */
-        if (target.classList.contains('carousel-dot')) {
-            var idx = parseInt(target.dataset.index);
-            card = target.closest('.project-card');
-            if (!card) return;
-            pid = card.dataset.projectId;
-            inst = findInstance(pid);
-            if (!inst) return;
-            inst.goTo(idx);
+        /* 圆点跳转 */
+        var dot = target.closest('[data-about-slide]');
+        if (dot) {
+            setProjectSlide(dot.dataset.aboutSlide, Number(dot.dataset.aboutSlideIndex), true);
             return;
         }
 
         /* 缩略图点击 */
-        if (target.closest('.thumbnail-item')) {
-            var thumbItem = target.closest('.thumbnail-item');
-            var tIdx = parseInt(thumbItem.dataset.index);
-            card = target.closest('.project-card');
-            if (!card) return;
-            pid = card.dataset.projectId;
-            inst = findInstance(pid);
-            if (!inst) return;
-            inst.goTo(tIdx);
+        var thumb = target.closest('[data-about-thumb]');
+        if (thumb) {
+            setProjectSlide(thumb.dataset.aboutThumb, Number(thumb.dataset.aboutSlideIndex), true);
             return;
         }
 
-        /* 图片点击 -> 全屏弹窗 */
-        if (target.tagName === 'IMG' && target.closest('.project-carousel-slide')) {
-            card = target.closest('.project-card');
+        /* 主图点击 → 打开 Lightbox */
+        var openTrigger = target.closest('.about-carousel-slide img');
+        if (openTrigger) {
+            var card = openTrigger.closest('[data-about-project]');
             if (!card) return;
-            pid = card.dataset.projectId;
-            var proj = getProjectById(pid);
-            if (!proj || !proj.images) return;
+            pid = card.dataset.aboutProject;
+            var currentIndex = currentSlideByProject.get(pid) || 0;
+            stopProjectTimer(pid);
+            openLightbox(pid, currentIndex);
+            return;
+        }
 
-            var currentSrc = target.getAttribute('src');
-            var clickIndex = 0;
-            for (var k = 0; k < proj.images.length; k++) {
-                if (proj.images[k].src === currentSrc) { clickIndex = k; break; }
-            }
+        /* Lightbox 关闭（按钮 + 遮罩 backdrop） */
+        if (target.closest('[data-about-close]')) { closeLightbox(); return; }
 
-            inst = findInstance(pid);
-            if (inst) inst.stopAutoPlay();
+        /* Lightbox 导航 */
+        if (target.closest('[data-about-lightbox-prev]')) { stepLightboxSlide(-1); return; }
+        if (target.closest('[data-about-lightbox-next]')) { stepLightboxSlide(1); return; }
+    }
 
-            openLightbox(proj.images, clickIndex);
+    function handleMouseEnter(event) {
+        var card = event.target.closest?.('[data-about-project]');
+        if (card && pageRoot?.contains(card)) {
+            stopProjectTimer(card.dataset.aboutProject);
         }
     }
 
-    function findInstance(projectId) {
-        for (var i = 0; i < carouselInstances.length; i++) {
-            if (carouselInstances[i].getId() === projectId) return carouselInstances[i];
+    function handleMouseLeave(event) {
+        var card = event.target.closest?.('[data-about-project]');
+        if (card && pageRoot?.contains(card)) {
+            var project = findProject(card.dataset.aboutProject);
+            startProjectTimer(project);
         }
-        return null;
     }
 
-    /* ==================== 8. 生命周期 ==================== */
+    function handleKeydown(event) {
+        if (!lightboxState) return;
+        if (event.key === 'Escape') { closeLightbox(); return; }
+        if (event.key === 'ArrowLeft') { stepLightboxSlide(-1); event.preventDefault(); return; }
+        if (event.key === 'ArrowRight') { stepLightboxSlide(1); event.preventDefault(); }
+    }
+
+    /* ==================== 10. 生命周期 ==================== */
     function init() {
+        pageRoot = document.querySelector('[data-about-page]');
+        if (!pageRoot) return;
+
+        /* 初始化每个项目的当前索引 */
+        projects.forEach(function (proj) {
+            currentSlideByProject.set(proj.id, 0);
+        });
+
         /* 图片加载失败兜底 */
-        var allImgs = document.querySelectorAll('.project-carousel-slide img');
-        for (var i = 0; i < allImgs.length; i++) {
-            var img = allImgs[i];
+        pageRoot.querySelectorAll('.about-carousel-slide img').forEach(function (img) {
             if (img.complete && (img.naturalWidth === 0 || img.naturalHeight === 0)) {
                 showImgError(img);
             }
-            img.addEventListener('error', function () {
-                showImgError(this);
-            });
-        }
+            img.addEventListener('error', function () { showImgError(this); });
+        });
 
-        /* 缩略图加载失败兜底（静默处理，不显示占位文字） */
-        document.querySelectorAll('.thumbnail-item img').forEach(function (thumbImg) {
-            thumbImg.addEventListener('error', function () {
-                this.style.display = 'none';
-            });
-            if (thumbImg.complete && (thumbImg.naturalWidth === 0 || thumbImg.naturalHeight === 0)) {
-                thumbImg.style.display = 'none';
+        /* 缩略图加载失败静默处理 */
+        pageRoot.querySelectorAll('.about-thumbnail img').forEach(function (img) {
+            img.addEventListener('error', function () { this.style.display = 'none'; });
+            if (img.complete && (img.naturalWidth === 0 || img.naturalHeight === 0)) {
+                img.style.display = 'none';
             }
         });
 
-        /* 创建走马灯实例 */
-        for (var p = 0; p < projects.length; p++) {
-            var inst = createCarousel(projects[p].id, projects[p].images);
-            if (inst) carouselInstances.push(inst);
-        }
+        /* 将每个轨道初始定位到第 0 帧 */
+        pageRoot.querySelectorAll('[data-about-track]').forEach(function (track) {
+            track.style.transform = 'translateX(0%)';
+        });
 
-        /* 事件委托 */
-        var contentArea = document.getElementById('content-area');
-        if (contentArea) {
-            contentArea.addEventListener('click', onContentClick);
-            contentDelegation = { element: contentArea, handler: onContentClick };
-        }
+        /* 绑定事件委托 */
+        clickHandler = handlePageClick;
+        mouseenterHandler = handleMouseEnter;
+        mouseleaveHandler = handleMouseLeave;
+        keydownHandler = handleKeydown;
+
+        pageRoot.addEventListener('click', clickHandler);
+        pageRoot.addEventListener('mouseenter', mouseenterHandler, true);
+        pageRoot.addEventListener('mouseleave', mouseleaveHandler, true);
+        document.addEventListener('keydown', keydownHandler);
+
+        startAutoPlay();
     }
 
     function showImgError(img) {
-        if (img.parentElement.querySelector('.slide-placeholder')) return;
+        if (img.parentElement.querySelector('.about-image-placeholder')) return;
         img.style.display = 'none';
         var placeholder = document.createElement('div');
-        placeholder.className = 'slide-placeholder';
+        placeholder.className = 'about-image-placeholder';
         placeholder.textContent = '⚠️ 图片加载失败';
         img.parentElement.appendChild(placeholder);
     }
 
     function cleanup() {
-        for (var i = 0; i < carouselInstances.length; i++) {
-            carouselInstances[i].destroy();
-        }
-        carouselInstances = [];
+        carouselTimers.forEach(function (id) { window.clearInterval(id); });
+        carouselTimers.clear();
+        currentSlideByProject.clear();
+        lightboxState = null;
 
-        closeLightbox();
-
-        if (contentDelegation) {
-            contentDelegation.element.removeEventListener('click', contentDelegation.handler);
-            contentDelegation = null;
+        /* 移除滚轮监听 */
+        if (wheelHandler && pageRoot) {
+            var lb = pageRoot.querySelector('[data-about-lightbox]');
+            if (lb) lb.removeEventListener('wheel', wheelHandler, { passive: false });
+            wheelHandler = null;
         }
+
+        if (pageRoot && clickHandler) {
+            pageRoot.removeEventListener('click', clickHandler);
+            pageRoot.removeEventListener('mouseenter', mouseenterHandler, true);
+            pageRoot.removeEventListener('mouseleave', mouseleaveHandler, true);
+        }
+        if (keydownHandler) {
+            document.removeEventListener('keydown', keydownHandler);
+        }
+
+        pageRoot = null;
+        clickHandler = null;
+        mouseenterHandler = null;
+        mouseleaveHandler = null;
+        keydownHandler = null;
+        lastWheelTime = 0;
     }
 
     return {

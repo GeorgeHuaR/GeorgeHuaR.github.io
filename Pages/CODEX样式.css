@@ -1,0 +1,512 @@
+/* ========== ABOUTPAGE.CSS - 个人介绍页专属样式 ========== */
+/* 使用范围：
+ * - 仅服务 Pages/aboutPage.js 渲染出的“个人介绍 / 项目展示”页面。
+ * - 本文件只消费 style.css 与 themes.css 提供的主题 token，不在这里定义新的主题变量。
+ * - About 页面计划作为首页时，本文件应在 index.html 的 head 中直接加载，避免首屏渲染后再补样式。
+ *
+ * 维护边界：
+ * - 项目内容、图片路径、轮播配置放在 aboutPage.js 的 projects 数组中维护。
+ * - 布局、固定图片窗口、轮播控件、缩略图、lightbox 和响应式规则放在本文件维护。
+ */
+
+/* ========== 1. Page Shell：页面外壳与导语 ========== */
+/* V6.6：About 页面以项目图片为核心，纵向排列导语和项目卡片，避免做成营销式落地页。 */
+.about-page {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* 导语继续复用 .content-card 的主题背景、边框和阴影；这里仅控制内部排版。 */
+.about-intro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+/* 限制导语宽度，避免大屏下说明文字过长影响阅读。 */
+.about-intro-text {
+    max-width: 760px;
+}
+
+/* eyebrow/kicker 是弱标题信息：用于展示英文栏目名或项目一句话摘要。 */
+.about-eyebrow,
+.about-project-kicker {
+    margin-bottom: 8px;
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+/* 导语正文保持低强调，避免和项目标题抢层级。 */
+.about-intro p:last-child {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+}
+
+/* ========== 2. Project Cards：项目卡片与文字信息 ========== */
+/* 项目列表保持纵向阅读顺序，后续新增/删除项目时不影响整体布局策略。 */
+.about-project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* 标准项目卡片：左侧文字、右侧图片，图片区域获得更大宽度以符合“图片展示为核心”。 */
+.about-project-card {
+    --about-media-ratio: 16 / 9;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.82fr) minmax(320px, 1.18fr);
+    gap: 22px;
+    align-items: start;
+}
+
+/* featured 版式用于重点项目：进一步扩大图片列，适合作为页面第一张主项目。 */
+.about-project-card--featured {
+    grid-template-columns: minmax(240px, 0.74fr) minmax(420px, 1.26fr);
+}
+
+/* compact 版式用于说明较短或图片较少的项目：媒体窗口改为 4:3，整体更紧凑。 */
+.about-project-card--compact {
+    --about-media-ratio: 4 / 3;
+    grid-template-columns: minmax(220px, 0.95fr) minmax(280px, 1.05fr);
+}
+
+/* 文案列只负责标题、标签和简短说明，不承载复杂装饰。 */
+.about-project-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+
+/* 项目标题比 content-card h2 低一级，避免每张项目卡都像页面主标题。 */
+.about-project-header h3 {
+    margin: 0;
+    font-size: 1.18rem;
+    line-height: 1.35;
+}
+
+/* 标签列表允许换行，保证项目技术点增减时不撑破卡片。 */
+.about-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* 标签使用主题 control surface，语义上属于轻量元信息，而不是主要操作按钮。 */
+.about-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border: var(--border-width) solid var(--border-color-subtle);
+    border-radius: var(--radius-pill);
+    background: var(--surface-control);
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+/* 说明文本保持段落间距，方便后续写“项目目标 / 负责内容 / 结果”这类短说明。 */
+.about-project-description {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+}
+
+/* 媒体列允许收缩，配合图片窗口的 aspect-ratio 防止网格溢出。 */
+.about-project-media {
+    min-width: 0;
+}
+
+/* ========== 3. Media Frame：固定图片窗口 ========== */
+/* 固定比例窗口是本页核心：它解决图片原始尺寸不一致导致卡片高低跳动的问题。 */
+.about-media-frame {
+    position: relative;
+    aspect-ratio: var(--about-media-ratio);
+    overflow: hidden;
+    border: var(--border-width) solid var(--border-color-subtle);
+    border-radius: var(--radius-card);
+    background: var(--surface-card);
+    box-shadow: var(--shadow-card);
+}
+
+/* 主图整体作为可点击区域；点击行为由 aboutPage.js 打开 lightbox。 */
+.about-media-open {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: zoom-in;
+    display: block;
+}
+
+/* 临时无图时仍保留固定窗口，便于先搭页面结构再补真实项目图片。 */
+.about-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: var(--color-text-muted);
+    background: var(--surface-control);
+    font-weight: 700;
+}
+
+/* 图片填满固定窗口；具体裁切策略由 contain/cover 修饰类决定。 */
+.about-project-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+/* contain 适合软件截图：完整展示界面，不裁掉边缘信息。 */
+.about-media-frame--contain .about-project-image {
+    object-fit: contain;
+}
+
+/* cover 适合照片、封面或氛围图：填满窗口，但可能裁切边缘。 */
+.about-media-frame--cover .about-project-image {
+    object-fit: cover;
+}
+
+/* 轻微放大只作为可点击反馈，不改变窗口尺寸。 */
+.about-media-open:hover .about-project-image {
+    transform: scale(1.015);
+}
+
+/* 图片说明位于窗口下方，避免覆盖截图中的关键内容。 */
+.about-media-caption {
+    min-height: 24px;
+    margin-top: 10px;
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+/* ========== 4. Carousel Controls：轮播控制 ========== */
+/* 左右按钮覆盖在媒体窗口边缘，仅用于多图项目；是否渲染由 aboutPage.js 决定。 */
+.about-carousel-btn {
+    position: absolute;
+    top: 50%;
+    width: 36px;
+    height: 44px;
+    border: var(--border-width) solid var(--border-color-subtle);
+    border-radius: var(--radius-control);
+    background: var(--surface-overlay);
+    color: var(--color-on-overlay);
+    cursor: pointer;
+    font-size: 1.7rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+/* hover 只强调边框和背景，不移动按钮，避免遮挡图片时产生晃动。 */
+.about-carousel-btn:hover {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+}
+
+/* 左按钮固定贴近窗口左边缘，保留 10px 内距避免贴边难点。 */
+.about-carousel-btn--prev {
+    left: 10px;
+}
+
+/* 右按钮固定贴近窗口右边缘，与左按钮保持对称。 */
+.about-carousel-btn--next {
+    right: 10px;
+}
+
+/* 图片计数器是低成本状态提示，帮助用户理解当前项目有多少张图。 */
+.about-media-counter {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    min-width: 54px;
+    padding: 4px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-overlay);
+    color: var(--color-on-overlay);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* 圆点用于快速感知图片数量，适合图片少但不展示缩略图的项目。 */
+.about-carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* 圆点保持小尺寸，避免和缩略图两套导航抢层级。 */
+.about-carousel-dot {
+    width: 10px;
+    height: 10px;
+    border: var(--border-width) solid var(--border-color-subtle);
+    border-radius: 50%;
+    background: var(--surface-control);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.about-carousel-dot:hover,
+.about-carousel-dot.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    transform: scale(1.08);
+}
+
+/* ========== 5. Thumbnails：可选缩略图条 ========== */
+/* 缩略图适合图片较多的重点项目；是否显示由 projects[].showThumbnails 控制。 */
+.about-thumbnail-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* 缩略图固定 16:9，方便同一项目内不同尺寸图片对齐。 */
+.about-thumbnail {
+    aspect-ratio: 16 / 9;
+    padding: 0;
+    overflow: hidden;
+    border: var(--border-width) solid var(--border-color-subtle);
+    border-radius: var(--radius-control);
+    background: var(--surface-control);
+    cursor: pointer;
+    opacity: 0.72;
+    transition: opacity 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+/* 当前缩略图和 hover 使用同一视觉语言：提高不透明度并强调主题色边框。 */
+.about-thumbnail:hover,
+.about-thumbnail.active {
+    opacity: 1;
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+}
+
+/* 缩略图使用 cover，目标是识别图片，不承担完整信息展示。 */
+.about-thumbnail img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* ========== 6. Lightbox：原图预览 ========== */
+/* lightbox 固定覆盖整个视口，用于查看固定窗口内被缩放后的原图细节。 */
+.about-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+}
+
+.about-lightbox[hidden],
+.about-lightbox [hidden] {
+    /* V6.6 Bugfix：作者样式的 display 会覆盖 HTML hidden 属性，这里显式恢复隐藏语义。 */
+    display: none !important;
+}
+
+/* 遮罩负责弱化页面背景；点击遮罩由 aboutPage.js 关闭预览。 */
+.about-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: var(--blur-surface);
+}
+
+/* 预览面板采用“左按钮 + 图片 + 右按钮”网格，保证导航按钮不压在原图上。 */
+.about-lightbox-panel {
+    position: relative;
+    z-index: 1;
+    width: min(1100px, 94vw);
+    max-height: 90vh;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    align-items: center;
+    gap: 12px;
+}
+
+/* figure 是实际图片容器，继续读取主题 overlay surface 保持跨主题可读性。 */
+.about-lightbox-figure {
+    min-width: 0;
+    margin: 0;
+    padding: 14px;
+    border: var(--border-width) solid var(--border-color-subtle);
+    border-radius: var(--radius-panel);
+    background: var(--surface-overlay);
+    color: var(--color-on-overlay);
+    box-shadow: var(--shadow-panel);
+}
+
+/* 预览图按视口限制最大高度，避免大图溢出屏幕。 */
+.about-lightbox-image {
+    width: 100%;
+    max-height: 76vh;
+    display: block;
+    object-fit: contain;
+    border-radius: var(--radius-card);
+}
+
+/* caption 同时显示图片说明和序号；小屏下会改为纵向排列。 */
+.about-lightbox-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    color: var(--color-on-overlay);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* 计数器固定宽度语义，不参与说明文本换行。 */
+.about-lightbox-counter {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    font-weight: 700;
+}
+
+/* 关闭按钮和左右预览按钮共享基础控件样式，便于主题统一。 */
+.about-lightbox-close,
+.about-lightbox-nav {
+    border: var(--border-width) solid var(--border-color-subtle);
+    background: var(--surface-overlay);
+    color: var(--color-on-overlay);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-control);
+}
+
+/* 关闭按钮贴在图片容器右上角，避免用户寻找关闭入口。 */
+.about-lightbox-close {
+    position: absolute;
+    top: -18px;
+    right: -18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    z-index: 2;
+}
+
+/* 预览导航按钮尺寸比卡片轮播按钮更大，适合全屏预览场景。 */
+.about-lightbox-nav {
+    width: 48px;
+    height: 56px;
+    border-radius: var(--radius-control);
+    font-size: 2rem;
+}
+
+.about-lightbox-close:hover,
+.about-lightbox-nav:hover {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+}
+
+/* ========== 7. Responsive：About 页面响应式 ========== */
+/* 平板宽度下项目卡片改为单列，优先保证图片展示区宽度和说明文本可读性。 */
+@media screen and (max-width: 1024px) {
+    .about-project-card,
+    .about-project-card--featured,
+    .about-project-card--compact {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 手机宽度下压缩间距和控件尺寸，避免轮播按钮、缩略图和 lightbox 导航挤占图片。 */
+@media screen and (max-width: 768px) {
+    .about-page {
+        gap: 16px;
+    }
+
+    .about-project-card {
+        gap: 16px;
+    }
+
+    .about-project-header h3 {
+        font-size: 1.08rem;
+    }
+
+    .about-tag {
+        min-height: 26px;
+        padding: 0 8px;
+        font-size: 0.76rem;
+    }
+
+    .about-carousel-btn {
+        width: 32px;
+        height: 38px;
+        font-size: 1.4rem;
+    }
+
+    .about-thumbnail-strip {
+        grid-template-columns: repeat(auto-fit, minmax(58px, 1fr));
+    }
+
+    .about-lightbox {
+        padding: 14px;
+    }
+
+    .about-lightbox-panel {
+        width: 96vw;
+        grid-template-columns: 38px minmax(0, 1fr) 38px;
+        gap: 6px;
+    }
+
+    .about-lightbox-figure {
+        padding: 10px;
+    }
+
+    .about-lightbox-nav {
+        width: 38px;
+        height: 48px;
+        font-size: 1.6rem;
+    }
+
+    .about-lightbox-close {
+        top: -12px;
+        right: -8px;
+        width: 34px;
+        height: 34px;
+    }
+}
+
+/* 小屏手机下改用更方的媒体比例，避免 16:9 图片窗口在窄屏中过矮。 */
+@media screen and (max-width: 480px) {
+    .about-project-card {
+        --about-media-ratio: 4 / 3;
+    }
+
+    .about-media-caption {
+        font-size: 0.78rem;
+    }
+
+    .about-thumbnail-strip {
+        grid-template-columns: repeat(auto-fit, minmax(46px, 1fr));
+        gap: 6px;
+    }
+
+    .about-lightbox-caption {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
