@@ -115,6 +115,7 @@
     height: 100%;
     display: block;
     cursor: pointer;
+    border-radius: calc(var(--radius-control) * 0.5);
     transition: transform 0.2s ease, opacity 0.25s ease;
 }
 .about-carousel-slide img:hover {
@@ -312,14 +313,14 @@
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* 弹窗卡片：固定深灰色背景，尺寸约束 */
+/* 弹窗卡片：暖灰白面板，在暗遮罩上浮出层次 */
 .about-lightbox-panel {
     position: relative;
     z-index: 1;
     width: min(1100px, 94vw);
     max-height: 90vh;
-    /* background: rgba(25, 25, 30, 0.93); */
-    background: rgba(252, 252, 255, 0.951);
+    background: rgba(245, 245, 248, 0.97);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     padding: 14px;
 }
@@ -401,7 +402,7 @@
     justify-content: space-between;
     gap: 12px;
     margin-top: 10px;
-    color: rgba(28, 26, 26, 0.578);
+    color: rgba(30, 30, 35, 0.88);
     font-size: 0.9rem;
     line-height: 1.5;
 }
@@ -409,7 +410,7 @@
 /* 计数器 "1/N" */
 .about-lightbox-counter {
     flex-shrink: 0;
-    color: rgba(255, 255, 255, 0.50);
+    color: rgba(30, 30, 35, 0.45);
     font-weight: 700;
 }
 

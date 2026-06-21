@@ -29,7 +29,7 @@ const AboutPage = (function () {
             techTags: ['JavaScript', 'CSS3', 'LocalStorage'],
             showThumbnails: true,
             autoPlay: false,
-            imageFit: 'contain',
+            imageFit: 'cover',
             images: [
                 { src: 'Assets/AboutMe/微信图片_20251024163842_22_32.jpg', caption: '首页——书签网格与分类工具栏' },
                 { src: 'Assets/AboutMe/微信图片_20251024163843_23_32.jpg', caption: '深色主题下的页面效果展示' }
@@ -45,7 +45,7 @@ const AboutPage = (function () {
             techTags: ['ECharts', 'Vue', 'SCSS'],
             showThumbnails: true,
             autoPlay: true,
-            imageFit: 'contain',
+            imageFit: 'cover',
             images: [
                 { src: 'Assets/AboutMe/微信图片_20251024163843_24_32.jpg', caption: '仪表盘——关键指标概览' },
                 { src: 'Assets/AboutMe/微信图片_20251024163844_25_32.jpg', caption: '数据趋势——时间序列分析' },

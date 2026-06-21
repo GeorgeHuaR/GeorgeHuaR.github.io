@@ -81,7 +81,15 @@ var projects = [
 - 手机端 overflow:auto 原生双指缩放
 - 移除计数器，dots 保留在 figure 底部
 
-
-
-
+## V7.1.3 Lightbox 单图 src-swap + 固定卡片布局
+- Lightbox 从 track 多 slide 架构改为单 `<img>` src 直接切换，消除 track 布局冲突
+- 外层 container 从 flex column 改为 grid place-items:center，撑满视口
+- 新增 `.about-lightbox-backdrop` 独立遮罩层（点击关闭），与面板分离
+- 面板改为固定深灰 `rgba(25,25,30,0.93)` 卡片 → 后续改为暖灰白 `rgba(245,245,248,0.97)`
+- 导航/关闭按钮从 panel 级 flex item 移入 figure 内 absolute 叠放在图片上
+- 按钮样式脱离主题变量，使用固定半透明色（黑底 `rgba(0,0,0,0.30)` / hover 0.50）
+- caption + counter 文字从主题变量改为固定色值，适配浅色面板
+- 移除 Lightbox 内 dots（dots 无 slide 可索引），恢复计数器 "1/N" 与 caption 同行
+- 弃用缩放功能（overflow:auto + wheel 切换冲突，功能搁置）
+- 修复：走马灯图片 `border-radius` 缺失导致 object-fit:contain 时图片内容直角不贴合容器圆角
 ---
