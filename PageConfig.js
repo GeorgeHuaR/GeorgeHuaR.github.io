@@ -29,11 +29,11 @@
             // ,isDefault: true 
         },
         {
-            id: 'changelog',
+            id: 'editor',
             name: '编辑器',
             icon: '📋',
             type: 'module',
-            moduleName: 'ChangelogPage'
+            moduleName: 'EditorPage'
         },
         {
             id: 'settings',
