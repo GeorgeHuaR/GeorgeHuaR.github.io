@@ -18,11 +18,13 @@ const EditorPage = (function() {
     let state = {
         currentListId: null,
         sortBy: 'createdAt',
-        filterBy: 'active'
+        filterBy: 'all',
+        mobileView: 'main' // 'sidebar' | 'main' 仅移动端生效
     };
     let container = null;
     let idCounter = Date.now();
     let editingListId = null;
+    let clockTimer = null;
 
     // ==================== 数据管理 ====================
     function getData() {
@@ -158,6 +160,15 @@ const EditorPage = (function() {
         return div.innerHTML;
     }
 
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+
+    function panelClass(panel) {
+        if (!isMobile()) return '';
+        return state.mobileView === panel ? ' active-mobile' : '';
+    }
+
     function render() {
         return '<div class="content-card editor-wrapper"><div class="editor-container" id="editor-container"></div></div>';
     }
@@ -171,17 +182,36 @@ const EditorPage = (function() {
         if (!state.currentListId || !findList(data, state.currentListId)) {
             state.currentListId = data.lists[0].id;
         }
-        container.innerHTML = renderSidebar(data) + renderMainArea(data);
+
+        // 停止旧的时钟定时器（DOM 即将被重建）
+        if (clockTimer) {
+            clearInterval(clockTimer);
+            clockTimer = null;
+        }
+
+        let showRight = window.innerWidth >= 1024;
+        container.innerHTML = '<div class="editor-sidebar' + panelClass('sidebar') + '">'
+            + renderSidebar(data)
+            + '</div>'
+            + '<div class="editor-main' + panelClass('main') + '">'
+            + renderMainArea(data)
+            + '</div>'
+            + (showRight ? renderRightPanel() : '');
+
+        if (showRight) startClock();
     }
 
     function renderSidebar(data) {
-        return '<div class="editor-sidebar">'
-            + '<div class="editor-sidebar-header"><h3>📋 清单</h3></div>'
+        return '<div class="editor-sidebar-header">'
+            + '<div class="editor-sidebar-header-row">'
+            + '<h3>📋 清单</h3>'
+            + '<button class="editor-mobile-toggle">✕</button>'
+            + '</div>'
+            + '</div>'
             + '<div class="editor-list-list">'
             + data.lists.map(renderListItem).join('')
             + '</div>'
-            + '<div class="editor-sidebar-footer"><button class="editor-btn-add-list">+ 新建清单</button></div>'
-            + '</div>';
+            + '<div class="editor-sidebar-footer"><button class="editor-btn-add-list">+ 新建清单</button></div>';
     }
 
     function renderListItem(list) {
@@ -205,12 +235,10 @@ const EditorPage = (function() {
 
     function renderMainArea(data) {
         let list = findList(data, state.currentListId);
-        if (!list) return '<div class="editor-main"><div class="editor-empty"><p>请选择一个清单</p></div></div>';
-        return '<div class="editor-main">'
-            + renderToolbar(list)
+        if (!list) return '<div class="editor-empty"><p>请选择一个清单</p></div>';
+        return renderToolbar(list)
             + renderInputRow()
-            + renderTodoList(list)
-            + '</div>';
+            + renderTodoList(list);
     }
 
     function renderToolbar(list) {
@@ -223,6 +251,7 @@ const EditorPage = (function() {
             { value: 'all', label: '全部' }
         ];
         return '<div class="editor-toolbar">'
+            + '<button class="editor-mobile-back">← 清单</button>'
             + '<h3>' + escapeHtml(list.name) + '</h3>'
             + '<div class="editor-toolbar-right">'
             + '<select class="editor-sort-select">'
@@ -237,7 +266,7 @@ const EditorPage = (function() {
 
     function renderInputRow() {
         return '<div class="editor-input-row">'
-            + '<input type="text" class="editor-input" placeholder="添加待办..." id="editor-todo-input">'
+            + '<input type="text" class="editor-input" placeholder="添加待办...(Enter确认)" id="editor-todo-input">'
             + '<button class="editor-btn-add">添加</button>'
             + '</div>';
     }
@@ -255,12 +284,82 @@ const EditorPage = (function() {
     function renderTodoItem(item) {
         let doneClass = item.done ? ' done' : '';
         let priorityClass = item.priority ? ' priority-' + item.priority : '';
+        // 格式化创建时间为 MM-DD
+        let dateObj = new Date(item.createdAt);
+        let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        let day = String(dateObj.getDate()).padStart(2, '0');
+        let dateStr = month + '-' + day;
         return '<div class="editor-todo-item' + doneClass + '" data-todo-id="' + item.id + '" data-list-id="' + state.currentListId + '">'
             + '<span class="editor-todo-check">' + (item.done ? '☑' : '☐') + '</span>'
             + '<span class="editor-todo-text">' + escapeHtml(item.text) + '</span>'
+            + '<span class="editor-todo-date">' + dateStr + '</span>'
             + '<span class="editor-todo-priority' + priorityClass + '"></span>'
             + '<span class="editor-todo-delete">🗑️</span>'
             + '</div>';
+    }
+
+    // ==================== 右侧面板：时钟 + 月历 ====================
+    function formatTime(date) {
+        return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+    }
+
+    function formatDate(date) {
+        let days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日 ' + days[date.getDay()];
+    }
+
+    function renderRightPanel() {
+        let now = new Date();
+        return '<div class="editor-right-panel">'
+            + renderClock(now)
+            + renderCalendar(now)
+            + '</div>';
+    }
+
+    function renderClock(now) {
+        return '<div class="editor-clock">'
+            + '<div class="editor-clock-time" id="editor-clock-time">' + formatTime(now) + '</div>'
+            + '<div class="editor-clock-date" id="editor-clock-date">' + formatDate(now) + '</div>'
+            + '</div>';
+    }
+
+    function renderCalendar(now) {
+        let year = now.getFullYear();
+        let month = now.getMonth();
+        let today = now.getDate();
+        let firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+        let daysInMonth = new Date(year, month + 1, 0).getDate();
+        let header = year + '年' + (month + 1) + '月';
+        let weekdays = '一二三四五六日'.split('').map(function(d) { return '<span>' + d + '</span>'; }).join('');
+
+        // 月历从周一开始
+        let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+        let cells = '';
+        for (let i = 0; i < startOffset; i++) {
+            cells += '<span class="editor-calendar-empty"></span>';
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+            let isToday = d === today ? ' today' : '';
+            cells += '<span class="editor-calendar-day' + isToday + '">' + d + '</span>';
+        }
+
+        return '<div class="editor-calendar">'
+            + '<div class="editor-calendar-header">' + header + '</div>'
+            + '<div class="editor-calendar-weekdays">' + weekdays + '</div>'
+            + '<div class="editor-calendar-grid">' + cells + '</div>'
+            + '</div>';
+    }
+
+    function startClock() {
+        if (clockTimer) return;
+        clockTimer = setInterval(function() {
+            let timeEl = document.getElementById('editor-clock-time');
+            let dateEl = document.getElementById('editor-clock-date');
+            if (!timeEl || !dateEl) return;
+            let now = new Date();
+            timeEl.textContent = formatTime(now);
+            dateEl.textContent = formatDate(now);
+        }, 1000);
     }
 
     // ==================== CSS 动态加载 ====================
@@ -281,6 +380,20 @@ const EditorPage = (function() {
     // ==================== 事件处理（单次委托） ====================
     function handleClick(e) {
         let target = e.target;
+
+        // ---- 移动端：关闭清单侧栏 ----
+        if (target.closest('.editor-mobile-toggle')) {
+            state.mobileView = 'main';
+            renderFullUI();
+            return;
+        }
+
+        // ---- 移动端：返回清单侧栏 ----
+        if (target.closest('.editor-mobile-back')) {
+            state.mobileView = 'sidebar';
+            renderFullUI();
+            return;
+        }
 
         // ---- 清单删除 ----
         let delBtn = target.closest('.editor-btn-list-delete');
@@ -310,6 +423,7 @@ const EditorPage = (function() {
             if (listId !== state.currentListId) {
                 state.currentListId = listId;
                 editingListId = null;
+                if (isMobile()) state.mobileView = 'main';
                 renderFullUI();
             }
             return;
@@ -321,6 +435,7 @@ const EditorPage = (function() {
             if (name && name.trim()) {
                 let list = createList(name.trim());
                 state.currentListId = list.id;
+                if (isMobile()) state.mobileView = 'main';
                 renderFullUI();
             }
             return;
@@ -490,6 +605,10 @@ const EditorPage = (function() {
     }
 
     function cleanup() {
+        if (clockTimer) {
+            clearInterval(clockTimer);
+            clockTimer = null;
+        }
         unloadCSS();
         container = null;
     }

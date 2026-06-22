@@ -3,8 +3,32 @@
 # V7.3 编辑器开发
 
 [changelogPage改名EditorPage]【V7.3.1】✅
-[EditorPage]【V7.3.2】实现待办编辑器 MVP：多清单管理、待办 CRUD、优先级、排序过滤
-[EditorPage]【V7.3.2】新增 editorPage.css 独立样式，动态加载，.editor- 命名空间隔离
+
+【V7.3.2】 基本功能实现
+- 实现待办编辑器 MVP：多清单管理、待办 CRUD、优先级、排序过滤
+- 新增 editorPage.css 独立样式，动态加载，.editor- 命名空间隔离
+- 修复 UI 反馈：输入框 focus 阴影、默认筛选改为"全部"、复选框/优先级/编辑框尺寸调整、删除按钮右对齐
+- 输入框默认启用 accent 边框+阴影、优先级占位空心圆、删除按钮仅已完成显示
+
+【V7.3.3】 样式优化+功能更新
+- 修复 sidebar 分隔线（border-color-light → border-color-subtle）
+- 删除按钮 margin-left:auto 移除，恢复自然排列
+- 待办项新增 MM-DD 日期戳 pill
+- 宽屏布局优化：.editor-wrapper 增加 max-width: 960px;
+
+【V7.3.4】 移动端适配
+- 移动端 < 768px 时，侧栏与待办区切换显示（通过按钮切换"清单"↔"待办"）
+- 新增 panelClass() 控制移动端面板显隐
+- 选中清单或新建清单后自动切回待办视图
+
+【V7.3.5】 右侧时间日期面板
+- 新增 .editor-right-panel，≥ 1024px 时显示，< 768px 不干扰移动端
+- 数字时钟：HH:MM 大字 + 年月日星期，setInterval 每秒更新
+- 当月月历：周一始，今天高亮，只读无交互
+
+【V7.3.6】 滚动条修复
+- .editor-wrapper 改用 position:absolute 精确填充 .main-content 内容区，消除外层溢出滚动条
+- 移除 height:100% 导致的 padding 冲突
 
 ---
 
