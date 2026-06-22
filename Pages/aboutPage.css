@@ -1,10 +1,16 @@
-/* ========== ABOUTPAGE.CSS - About 页专属样式（V7.1.2） ========== */
+/* ========== ABOUTPAGE.CSS - About 页专属样式（V7.1.5） ========== */
 /* 使用范围：
- * - 仅服务 Pages/aboutPage.js 渲染出的“个人介绍 / 项目展示”页面。
+ * - 仅服务 Pages/aboutPage.js 渲染出的"个人介绍 / 项目展示"页面。
  * - 本文件只消费 style.css 与 themes.css 提供的主题 token，不定义新主题变量。
  * - 提前在 index.html head 中加载，避免首屏渲染后补样式造成闪烁。
  *
  * 命名约定：所有 class 以 about- 为前缀，与全局样式零冲突。
+ *
+ * V7.1.4：Card 从纵向堆叠改为 CSS Grid 左右分栏；
+ *         图片容器从固定 height 改为 aspect-ratio；
+ *         新增 layout 变体（featured/standard/compact）
+ * V7.1.5：counter 改为行内 pill 样式；carousel-btn 改为矩形与 lightbox 统一；
+ *         caption 降级为次要色
  */
 
 /* ========== 1. Page Shell：页面外壳与导语 ========== */
@@ -19,7 +25,7 @@
 }
 
 /* ========== 2. Project Cards：项目卡片 ========== */
-/* 统一复用 content-card 的语义 token，保持所有主题下视觉一致 */
+/* V7.1.4：改为 CSS Grid 左右分栏（copy + media），由 layout 类控制列宽比例 */
 .about-project-card {
     margin-bottom: 28px;
     padding: 24px;
@@ -29,13 +35,33 @@
     border: var(--border-width) solid var(--border-color-subtle);
     border-left: 6px solid var(--color-accent);
     box-shadow: var(--shadow-panel);
-    overflow: hidden;
+
+    /* Grid 分栏 */
+    display: grid;
+    grid-template-columns: minmax(200px, 0.85fr) minmax(300px, 1.15fr);
+    gap: 22px;
+    align-items: start;
+}
+
+/* layout 变体：featured — 图片列更宽（~68%），适合重点项目 */
+.about-project-card--featured {
+    grid-template-columns: minmax(200px, 0.65fr) minmax(360px, 1.35fr);
+}
+
+/* layout 变体：standard — 均衡分配（与默认一致，显式写出便于维护） */
+.about-project-card--standard {
+    grid-template-columns: minmax(200px, 0.85fr) minmax(300px, 1.15fr);
+}
+
+/* layout 变体：compact — 文字列稍宽 + 4:3 图片容器，更紧凑 */
+.about-project-card--compact {
+    grid-template-columns: minmax(220px, 0.95fr) minmax(280px, 1.05fr);
 }
 
 /* ---------- 2.1 文字区域（标题 + 标签 + 描述） ---------- */
-/* 位于图片上方，保证用户在滚动时先看到项目概要再看到截图 */
+/* Grid 左列，不再需要独立 margin-bottom（Grid gap 负责间距） */
 .about-project-copy {
-    margin-bottom: 18px;
+    min-width: 0;
 }
 .about-project-title {
     font-size: 1.2rem;
@@ -75,20 +101,25 @@
     margin-top: 6px;
 }
 
-/* ---------- 2.2 走马灯区域 ---------- */
-/* 包裹走马灯 + caption + 缩略图条，作为一个完整图片模块 */
-/* .about-media-area { */
-    /* 空容器，子元素控制全部布局 */
-/* } */
+/* ---------- 2.2 媒体列（Grid 右列） ---------- */
+/* 包裹走马灯 + caption + 缩略图条，Grid 右列 */
+.about-project-media {
+    min-width: 0;
+}
 
-/* 走马灯本体：固定高度保证切换时不跳动 */
+/* 走马灯本体：V7.1.4 从固定高度改为 aspect-ratio 弹性比例 */
 .about-media-frame {
     position: relative;
     width: 100%;
-    height: 460px;
+    aspect-ratio: var(--about-media-ratio, 16 / 9);
     overflow: hidden;
     border-radius: calc(var(--radius-control) * 0.5);
     background: var(--surface-control);
+}
+
+/* compact 布局使用 4:3，更紧凑 */
+.about-project-card--compact .about-media-frame {
+    --about-media-ratio: 4 / 3;
 }
 
 /* 轨道：flex 横向排列所有幻灯片 */
@@ -147,7 +178,7 @@
 }
 
 /* ---------- 2.3 切换箭头 ---------- */
-/* 半透明圆形底，hover 时加深 */
+/* V7.1.5：回退矩形→圆形（测试效果不如原圆形），保留 40×40 + scale hover */
 .about-carousel-btn {
     position: absolute;
     top: 50%;
@@ -216,23 +247,28 @@
     padding: 10px 4px 6px;
     display: flex;
     align-items: baseline;
-    gap: 4px;
-    color: var(--color-text-muted);
+    gap: 6px;
     font-size: 0.88rem;
     line-height: 1.4;
 }
+/* V7.1.5：caption 降级为与 description 同级的次要色，突出图片而非文本 */
 .about-media-caption .about-caption-text {
     flex: 1;
-    font-weight: 500;
-    color: var(--color-text);
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.55;
 }
-.about-media-caption .about-caption-sep {
-    opacity: 0.4;
-}
+/* V7.1.5：计数器改为白底黑字 pill，保留在 caption 行内 */
 .about-media-caption .about-media-counter {
+    display: inline-block;
     flex-shrink: 0;
-    opacity: 0.6;
-    font-size: 0.82rem;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #fff;
+    color: #111;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.6;
 }
 
 /* ---------- 2.6 缩略图条 ---------- */
@@ -415,10 +451,31 @@
 }
 
 /* ========== 4. Responsive ========== */
-/* 平板 (< 768px) */
+/* 1024px：Grid 列宽微调 */
+@media screen and (max-width: 1024px) {
+    .about-project-card--featured {
+        grid-template-columns: minmax(180px, 0.65fr) minmax(280px, 1.35fr);
+    }
+}
+
+/* 平板 (< 768px)：Grid 降级为单列（与 V7.1.3 视觉效果一致） */
 @media screen and (max-width: 768px) {
-    .about-project-card { padding: 18px; }
-    .about-media-frame { height: 340px; }
+    .about-project-card {
+        padding: 18px;
+        /* 单列：文字在上，图片在下 */
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .about-project-card--featured,
+    .about-project-card--standard,
+    .about-project-card--compact {
+        /* 所有 layout 变体在单列模式下统一平铺 */
+        grid-template-columns: 1fr;
+    }
+    .about-media-frame {
+        aspect-ratio: auto;
+        height: 340px;
+    }
     .about-project-title { font-size: 1.1rem; }
     .about-project-description { font-size: 0.88rem; }
 
@@ -436,8 +493,9 @@
         padding: 12px;
         margin-bottom: 20px;
     }
-    .about-media-frame { height: 260px; }
-    .about-project-copy { margin-bottom: 12px; }
+    .about-media-frame {
+        height: 260px;
+    }
     .about-project-title {
         font-size: 1rem;
         margin-bottom: 6px;

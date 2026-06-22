@@ -92,4 +92,16 @@ var projects = [
 - 移除 Lightbox 内 dots（dots 无 slide 可索引），恢复计数器 "1/N" 与 caption 同行
 - 弃用缩放功能（overflow:auto + wheel 切换冲突，功能搁置）
 - 修复：走马灯图片 `border-radius` 缺失导致 object-fit:contain 时图片内容直角不贴合容器圆角
+
+## V7.1.4 图文布局优化
+- [数据] 新增 `layout: 'featured' | 'standard' | 'compact'` 字段
+- [渲染] 卡片改为 CSS Grid 左右分栏（左 copy + 右 media）
+- [样式] 替换固定 height 为 `aspect-ratio`，layout 联动比例
+- [响应式] ≥1024px Grid 分栏 → <768px 降级单列
+- [Grid 列宽] featured: `0.65fr / 1.35fr` 图片~68%，standard: `0.85fr / 1.15fr` 图片~57.5%，compact: `0.95fr / 1.05fr` 图片~52.5%
+
+## V7.1.5 样式微调
+- [样式] counter 改为行内白底黑字 pill，移除 caption 分隔符
+- [样式] carousel-btn 从圆形改为矩形 40×56 / radius 6px，与 lightbox 导航统一（测试后回退，恢复圆型）
+- [样式] caption 文本降级为 description 次要色（var(--color-text-muted)）
 ---

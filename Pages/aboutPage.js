@@ -1,11 +1,12 @@
 /** ---------------------------------------------------
- * @brief:      个人介绍页面模块 - 项目作品集展示（V7.1.3）
+ * @brief:      个人介绍页面模块 - 项目作品集展示（V7.1.4）
  * @file:       aboutPage.js
  * @author:     GeorgeHua
- * @date:       2026/06/21
- * @version:    V7.1.3
- * @details:    Lightbox 单图 src 交换 + 固定深色卡片；按钮 absolute 叠入
- *              figure（prev/next/close）；滚轮切换+300ms防抖；背景锁定
+ * @date:       2026/06/22
+ * @version:    V7.1.4
+ * @details:    图文布局优化 - CSS Grid 左右分栏 + aspect-ratio 弹性容器
+ *              layout(featured/standard/compact) 二维控制体系；
+ *              Lightbox 单图 src 交换（V7.1.3 保留）
  *----------------------------------------------------*/
 
 const AboutPage = (function () {
@@ -17,6 +18,7 @@ const AboutPage = (function () {
     };
 
     /* ==================== 2. 项目数据 ==================== */
+    /* layout: featured（图片列更宽） | standard（均衡） | compact（4:3 紧凑） */
     var projects = [
         {
             id: 'demo-1',
@@ -27,6 +29,7 @@ const AboutPage = (function () {
                 '数据持久化使用 localStorage，支持导入导出。'
             ],
             techTags: ['JavaScript', 'CSS3', 'LocalStorage'],
+            layout: 'featured',
             showThumbnails: true,
             autoPlay: false,
             imageFit: 'cover',
@@ -43,6 +46,7 @@ const AboutPage = (function () {
                 '用于测试走马灯组件在 multi-image 场景下的切换、缩略图、自动轮播等功能表现。'
             ],
             techTags: ['ECharts', 'Vue', 'SCSS'],
+            layout: 'standard',
             showThumbnails: true,
             autoPlay: true,
             imageFit: 'cover',
@@ -59,6 +63,7 @@ const AboutPage = (function () {
                 '单张图片项目，用于演示走马灯在单图情况下的降级表现。'
             ],
             techTags: ['Python', 'Flask', 'SQLite'],
+            layout: 'standard',
             showThumbnails: false,
             imageFit: 'contain',
             images: [
@@ -73,6 +78,7 @@ const AboutPage = (function () {
                 '涵盖首页、个人中心、设置页等核心页面的交互流程。'
             ],
             techTags: ['React Native', 'TypeScript', 'Styled Components'],
+            layout: 'compact',
             showThumbnails: true,
             autoPlay: false,
             imageFit: 'contain',
@@ -89,6 +95,7 @@ const AboutPage = (function () {
                 '使用 Storybook 进行组件展示与文档管理，支持主题变量实时切换预览。'
             ],
             techTags: ['Storybook', 'React', 'CSS Variables'],
+            layout: 'compact',
             showThumbnails: true,
             autoPlay: true,
             imageFit: 'contain',
@@ -159,6 +166,12 @@ const AboutPage = (function () {
             : 'about-media-frame--contain';
     }
 
+    /** 获取布局类名（默认 standard） */
+    function getLayoutClass(project) {
+        var layout = project.layout || 'standard';
+        return 'about-project-card--' + layout;
+    }
+
     /** 渲染多段 description 为多个 <p> 标签
      *  支持数组（多段）和字符串（向后兼容兜底） */
     function renderDescription(desc) {
@@ -219,15 +232,18 @@ const AboutPage = (function () {
 
         /* 缩略图条 */
         var thumbsHtml = (showMultiple && project.showThumbnails) ? renderThumbnails(project) : '';
+        /* layout 类名：控制 Grid 列宽比例 */
+        var layoutClass = getLayoutClass(project);
 
         return ''
-            + '<div class="about-project-card ' + fitClass + '" data-about-project="' + pid + '">'
+            /* Grid 容器：左 copy + 右 media */
+            + '<div class="about-project-card ' + fitClass + ' ' + layoutClass + '" data-about-project="' + pid + '">'
             +   '<div class="about-project-copy">'
             +     '<h3 class="about-project-title">' + escapeHtml(project.title) + '</h3>'
             +     renderTags(project.techTags)
             +     renderDescription(project.description)
             +   '</div>'
-            +   '<div class="about-media-area">'
+            +   '<div class="about-project-media">'
             +     '<div class="about-media-frame">'
             +       '<div class="about-carousel-track" data-about-track="' + pid + '">'
             +         slidesHtml
@@ -237,7 +253,6 @@ const AboutPage = (function () {
             +     '</div>'
             +     '<div class="about-media-caption">'
             +       '<span class="about-caption-text" data-about-caption="' + pid + '">' + escapeHtml(firstImage.caption || '') + '</span>'
-            +       '<span class="about-caption-sep">·</span>'
             +       '<span class="about-media-counter" data-about-counter="' + pid + '">1 / ' + total + '</span>'
             +     '</div>'
             +     thumbsHtml
