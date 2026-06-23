@@ -29,6 +29,8 @@
 【V7.3.6】 滚动条修复
 - .editor-wrapper 改用 position:absolute 精确填充 .main-content 内容区，消除外层溢出滚动条
 - 移除 height:100% 导致的 padding 冲突
+- About 页：.main-content 增加 max-height:100vh，溢出不撑高 body，触发主题滚动条而非文档默认滚动条
+- ❌ ———— 可能影响加载性能！
 
 ---
 
