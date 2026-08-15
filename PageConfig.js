@@ -14,11 +14,11 @@
     window.PageConfig = [
         {
             id: 'home',
-            name: 'GH-主页',
+            name: '书签主页',
             icon: '🏠',
             type: 'module',
             moduleName: 'HomePage',
-            isDefault: true // 明确指定首页
+            // isDefault: true // 明确指定首页
         },
         {
             id: 'about',
@@ -26,7 +26,7 @@
             icon: '😏',
             type: 'module',
             moduleName: 'AboutPage'
-            // ,isDefault: true 
+            ,isDefault: true 
         },
         {
             id: 'editor',

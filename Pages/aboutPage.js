@@ -12,9 +12,9 @@
 const AboutPage = (function () {
     /* ==================== 1. 全局配置 ==================== */
     var STYLE_CONFIG = {
-        autoPlay: false,
-        autoPlayInterval: 6000,
-        transitionDuration: 400
+        autoPlay: true,
+        autoPlayInterval: 5000,
+        transitionDuration: 600
     };
 
     /* ==================== 2. 项目数据 ==================== */
@@ -22,88 +22,97 @@ const AboutPage = (function () {
     var projects = [
         {
             id: 'demo-1',
-            title: '示例项目一：个人导航站',
+            title: 'LIA-硬件设计',
             description: [
-                '基于纯前端 SPA 架构的个人导航站，支持多主题切换、书签管理。',
-                '书签支持分类筛选、排序和搜索引擎集成。',
-                '数据持久化使用 localStorage，支持导入导出。'
+                '硬件设计：原理图设计 + 电路仿真 + PCB Layout + 实物焊接调试等',
+                '电源系统：输入 AC 220V => 电源模块 (DC 12V) => 电源板 (4层PCB设计， DC-DC + LDO 多路电源轨)',
+                '信号链路：BNC输入/输出 – 底板 (700K与100MSPS两种兼容型号设计) – 核心板(相干解调、FIR滤波等) – 通信接口',
+                '包括ADC/DAC驱动电路设计, 百兆数据转换底板设计（6层PCB，百兆信号阻抗匹配+并行信号线等长设计）',
+                '⚠️TODO: 较美观的PCBA实物图展示'
             ],
-            techTags: ['JavaScript', 'CSS3', 'LocalStorage'],
-            layout: 'featured',
+            techTags: ['器件选型', '原理图设计', 'PCB Layout','结构设计'],
+            layout: 'standard',
             showThumbnails: true,
-            autoPlay: false,
-            imageFit: 'cover',
+            autoPlay: true,
+            imageFit: 'contain',
             images: [
-                { src: 'Assets/AboutMe/微信图片_20251024163842_22_32.jpg', caption: '首页——书签网格与分类工具栏' },
-                { src: 'Assets/AboutMe/微信图片_20251024163843_23_32.jpg', caption: '深色主题下的页面效果展示' }
+                { src: 'Assets/AboutMe/电源树.png', caption: 'LIA-PWR 电源树' },
+                { src: 'Assets/AboutMe/电源板.png', caption: 'LIA-PWR 电源板' },
+                { src: 'Assets/AboutMe/百兆底板.png', caption: 'LIA-BaseBoard 百兆底板' },
+                { src: 'Assets/AboutMe/700K底板.png', caption: 'LIA-Lite 700K底板' },
+                { src: 'Assets/AboutMe/LIA机箱.png', caption: 'LIA-YG-V3 第三版机箱外壳（未装配PCB和电源模块）' }
             ]
         },
         {
             id: 'demo-2',
-            title: '示例项目二：数据可视化面板',
+            title: 'LIA-测控系统软件',
             description: [
-                '多图走马灯演示项目，展示三张不同场景与交互状态的截图。',
-                '用于测试走马灯组件在 multi-image 场景下的切换、缩略图、自动轮播等功能表现。'
+                '前端架构为主窗体框架 + 功能页路由，可见页面的定时器主动拉取后端数据，实现零阻塞测控',
+                '后端采用单生产者-多消费者异步管道，常驻解析线程完成帧解析与数据分发，支持百兆级实时数据处理',
+                '通信层支持 USB2.0 与 千兆网口UDP 两种通信实现；协议层支持可变帧长与自定义功能码',
+                '⚠️TODO:临时截图，需要补充实测数据截图'
             ],
-            techTags: ['ECharts', 'Vue', 'SCSS'],
-            layout: 'standard',
+            techTags: ['C#', 'Winform','.NET Framework 4.8'],
+            layout: 'compact',
             showThumbnails: true,
             autoPlay: true,
-            imageFit: 'cover',
+            imageFit: 'contain',
             images: [
-                { src: 'Assets/AboutMe/微信图片_20251024163843_24_32.jpg', caption: '仪表盘——关键指标概览' },
-                { src: 'Assets/AboutMe/微信图片_20251024163844_25_32.jpg', caption: '数据趋势——时间序列分析' },
-                { src: 'Assets/AboutMe/微信图片_20251024163845_26_32.jpg', caption: '用户画像——多维数据聚合' }
+                { src: 'Assets/AboutMe/上位机1.png', caption: '上位机-通信方式设置+系统Log' },
+                { src: 'Assets/AboutMe/上位机扫频.png', caption: '功能page:扫频' },
+                { src: 'Assets/AboutMe/上位机原始波形.png', caption: '功能page:原始波形' },
+                { src: 'Assets/AboutMe/上位机闭环控制.png', caption: '功能page:闭环控制' },
+                { src: 'Assets/AboutMe/上位机架构.png', caption: '软件架构' }
             ]
         },
         {
             id: 'demo-3',
-            title: '示例项目三：工具集应用',
+            title: '其他项目/个人DIY',
             description: [
-                '单张图片项目，用于演示走马灯在单图情况下的降级表现。'
+                'TODO：仿真、PCB、实物等'
             ],
-            techTags: ['Python', 'Flask', 'SQLite'],
+            techTags: ['PWM MOS驱动', '射频遥控','原边反馈反激电源'],
             layout: 'standard',
             showThumbnails: false,
             imageFit: 'contain',
             images: [
-                { src: 'Assets/AboutMe/p壁纸13.png', caption: '命令行工具运行界面' }
+                { src: 'Assets/AboutMe/牧野神奈.jpg', caption: '' }
             ]
         },
-        {
-            id: 'demo-4',
-            title: '示例项目四：移动端解决方案',
-            description: [
-                '包含多张移动端设计稿与交互原型预览，展示不同页面布局方案。',
-                '涵盖首页、个人中心、设置页等核心页面的交互流程。'
-            ],
-            techTags: ['React Native', 'TypeScript', 'Styled Components'],
-            layout: 'compact',
-            showThumbnails: true,
-            autoPlay: false,
-            imageFit: 'contain',
-            images: [
-                { src: 'Assets/AboutMe/p壁纸14.png', caption: '移动端首页布局方案' },
-                { src: 'Assets/AboutMe/p壁纸17.png', caption: '个人中心页面交互流程' }
-            ]
-        },
-        {
-            id: 'demo-5',
-            title: '示例项目五：组件库设计',
-            description: [
-                '通用 UI 组件库的设计与实现，涵盖按钮、表单、弹窗等常见交互组件的视觉规范。',
-                '使用 Storybook 进行组件展示与文档管理，支持主题变量实时切换预览。'
-            ],
-            techTags: ['Storybook', 'React', 'CSS Variables'],
-            layout: 'compact',
-            showThumbnails: true,
-            autoPlay: true,
-            imageFit: 'contain',
-            images: [
-                { src: 'Assets/AboutMe/p壁纸7.png', caption: 'Button & Input 组件概览' },
-                { src: 'Assets/AboutMe/微信图片_20251024163842_22_32.jpg', caption: '弹窗与 Toast 交互演示' }
-            ]
-        }
+        // {
+        //     id: 'demo-4',
+        //     title: '示例项目四：移动端解决方案',
+        //     description: [
+        //         '包含多张移动端设计稿与交互原型预览，展示不同页面布局方案。',
+        //         '涵盖首页、个人中心、设置页等核心页面的交互流程。'
+        //     ],
+        //     techTags: ['React Native', 'TypeScript', 'Styled Components'],
+        //     layout: 'compact',
+        //     showThumbnails: true,
+        //     autoPlay: false,
+        //     imageFit: 'contain',
+        //     images: [
+        //         { src: 'Assets/AboutMe/p壁纸14.png', caption: '移动端首页布局方案' },
+        //         { src: 'Assets/AboutMe/p壁纸17.png', caption: '个人中心页面交互流程' }
+        //     ]
+        // },
+        // {
+        //     id: 'demo-5',
+        //     title: '示例项目五：组件库设计',
+        //     description: [
+        //         '通用 UI 组件库的设计与实现，涵盖按钮、表单、弹窗等常见交互组件的视觉规范。',
+        //         '使用 Storybook 进行组件展示与文档管理，支持主题变量实时切换预览。'
+        //     ],
+        //     techTags: ['Storybook', 'React', 'CSS Variables'],
+        //     layout: 'compact',
+        //     showThumbnails: true,
+        //     autoPlay: true,
+        //     imageFit: 'contain',
+        //     images: [
+        //         { src: 'Assets/AboutMe/p壁纸7.png', caption: 'Button & Input 组件概览' },
+        //         { src: 'Assets/AboutMe/微信图片_20251024163842_22_32.jpg', caption: '弹窗与 Toast 交互演示' }
+        //     ]
+        // }
     ];
 
     /* ==================== 3. 内部状态 ==================== */
@@ -186,10 +195,12 @@ const AboutPage = (function () {
     function render() {
         return ''
             + '<div class="content-card about-intro">'
-            +   '<h2>👤 关于我</h2>'
-            +   '<p>GeorgeHua 的个人导航站，这里展示了我参与和开发的一些项目。点击图片可查看原图。</p>'
+            +   '<h2>👤 GeorgeHua (赵志华)的个人网页-2604 </h2>'
+            +   '<p>「书签主页」：书签分类、编辑、数据导入导出等；可在「设置」页获取书签图标、更改主题风格</p>'
+            +   '<p><strong>「个人介绍」</strong>：图文展示部分项目/个人DIY设计等（TODO 未完待续）</p>'
+            +   '<p>「 编 辑 器 」：分类的待办事项管理，数据存储在浏览器缓存</p>'
             + '</div>'
-            + '<h2 class="about-section-title">🚧 个人项目展示</h2>'
+            + '<h2 class="about-section-title">🚧 图文展示</h2>'
             + '<div data-about-page>'
             +   projects.map(renderProjectCard).join('')
             +   renderLightbox()
